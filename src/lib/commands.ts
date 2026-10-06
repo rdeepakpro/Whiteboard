@@ -25,7 +25,6 @@ import {
   reopenClosed,
   reveal,
   saveActive,
-  setDesignBoard,
   saveAs,
   saveAsTemplate,
 } from "./boards";
@@ -114,25 +113,6 @@ export const commands: Command[] = [
     palette: true,
     keywords: "template mind map swot flow",
     run: () => setApp({ dialog: { kind: "templates" } }),
-  },
-  {
-    id: "new-design",
-    title: "New Design…",
-    shortcut: "⌥⌘D",
-    palette: true,
-    keywords: "wireframe mockup ui screen app layout design kit",
-    run: () => setApp({ dialog: { kind: "templates", tab: "design" } }),
-  },
-  {
-    id: "toggle-design",
-    title: "Show/Hide Design Panel for This Board",
-    palette: true,
-    needsBoard: true,
-    keywords: "design kit wireframe components ui",
-    run: () => {
-      const t = activeTab();
-      if (t) setDesignBoard(t.path, !getApp().designBoards.includes(t.path));
-    },
   },
   {
     id: "new-folder",
@@ -383,20 +363,20 @@ export const commands: Command[] = [
     run: () => openSendToAction("blocker"),
   },
   {
-    id: "show-journey",
-    title: "Open Startup Journey",
+    id: "show-journal",
+    title: "Open Journal",
     palette: true,
     keywords: "check-in history log",
     run: () => {
       setMode("action");
-      setApp({ actionTab: "journey" });
+      setApp({ actionTab: "journal" });
     },
   },
   {
     id: "check-in",
     title: "Daily Check-in",
     palette: true,
-    keywords: "journey evening review",
+    keywords: "journal evening review",
     run: () => {
       setMode("action");
       setApp({ actionTab: "plan" });
@@ -548,7 +528,6 @@ const KEYMAP: Record<string, string> = {
   "mod+n": "new-board",
   "mod+t": "new-board",
   "mod+alt+n": "new-from-template",
-  "mod+alt+d": "new-design",
   "mod+shift+n": "new-folder",
   "mod+o": "open",
   "mod+s": "save",

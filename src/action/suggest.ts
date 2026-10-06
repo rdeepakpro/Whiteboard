@@ -139,7 +139,7 @@ export async function relatedBoards(seed: { text?: string; path?: string }, limi
 
 // -------------------------------------------------------------- summary
 
-/** One-line, rule-based summary of a stretch of the journey. */
+/** One-line, rule-based summary of a stretch of the journal. */
 export function summarize(checkIns: CheckIn[], done: ActionItem[]): string {
   const parts: string[] = [];
   if (checkIns.length) parts.push(`${checkIns.length} check-in${checkIns.length === 1 ? "" : "s"}`);
@@ -184,6 +184,6 @@ export async function aiSummary(checkIns: CheckIn[], done: ActionItem[]): Promis
     ...checkIns.map((c) => `${c.date}: moved: ${c.moved} | next: ${c.tomorrow} | blocked: ${c.blocking || "-"}`),
     ...done.map((d) => `done: ${d.title}`),
   ];
-  const prompt = `Summarize this founder's week in 2 plain sentences: what moved forward and what's blocking. No praise, no advice.\n\n${lines.join("\n")}`;
+  const prompt = `Summarize this person's week in 2 plain sentences: what moved forward and what's blocking. No praise, no advice.\n\n${lines.join("\n")}`;
   return ipc.localAi(localAiModel, prompt).catch(() => null);
 }

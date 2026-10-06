@@ -116,10 +116,6 @@ export const Icon = {
     <circle key="b" cx="7.5" cy="8.5" r="1.3" />,
     <path key="c" d="m3.5 14 4-3.5 3 2.5 2.5-2 3.5 3" />,
   ]),
-  design: svg([
-    <rect key="a" x="2.5" y="3.5" width="15" height="13" rx="2" />,
-    <path key="b" d="M2.5 7h15M6 10.5h4M6 13h6" />,
-  ]),
   link: svg(
     <path d="M8.5 11.5a3 3 0 0 0 4.2 0l2.6-2.6a3 3 0 0 0-4.2-4.2L10 5.8m1.5 2.7a3 3 0 0 0-4.2 0l-2.6 2.6a3 3 0 0 0 4.2 4.2L10 14.2" />,
   ),

@@ -496,13 +496,13 @@ mod tests {
     #[test]
     fn scan_tree_lists_boards_and_skips_hidden() {
         let d = tmpdir("scan");
-        fs::create_dir_all(d.join("Startup/Product")).unwrap();
+        fs::create_dir_all(d.join("Work/Ideas")).unwrap();
         fs::create_dir_all(d.join(".hidden")).unwrap();
-        fs::write(d.join("Startup/Product/Onboarding.excalidraw"), SCENE).unwrap();
+        fs::write(d.join("Work/Ideas/Onboarding.excalidraw"), SCENE).unwrap();
         fs::write(d.join("notes.txt"), "x").unwrap();
         let tree = scan_tree(d.to_string_lossy().into()).unwrap();
         assert_eq!(tree.len(), 1);
-        assert_eq!(tree[0].name, "Startup");
+        assert_eq!(tree[0].name, "Work");
         let product = &tree[0].children.as_ref().unwrap()[0];
         assert_eq!(product.children.as_ref().unwrap()[0].name, "Onboarding");
     }

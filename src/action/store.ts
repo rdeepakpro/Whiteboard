@@ -162,17 +162,21 @@ export function weekOutcomes(s = useAction.getState()) {
 }
 
 /** Why an item can't be added right now (the 3-item limits), or null. */
-export function limitReason(kind: ItemKind): string | null {
+export function limitReason(kind: ItemKind, date?: string | null): string | null {
   // Finished items don't count: the limit is about open commitments.
-  if (kind === "priority" && todaysPriorities().filter((i) => !i.doneAt).length >= LIMITS.priority)
-    return "Today already has 3 priorities.";
+  if (kind === "priority") {
+    const day = date ?? dayKey();
+    const open = useAction.getState().items.filter((i) => i.kind === "priority" && i.date === day && !i.doneAt).length;
+    if (open >= LIMITS.priority)
+      return day === dayKey() ? "Today already has 3 priorities." : "That day already has 3 priorities.";
+  }
   if (kind === "week" && weekOutcomes().filter((i) => !i.doneAt).length >= LIMITS.week)
     return "This week already has 3 outcomes.";
   return null;
 }
 
 export function addItem(input: Partial<ActionItem> & { kind: ItemKind; title: string }): ActionItem | null {
-  if (limitReason(input.kind)) return null;
+  if (limitReason(input.kind, input.date)) return null;
   const item: ActionItem = {
     id: uid(),
     createdAt: Date.now(),

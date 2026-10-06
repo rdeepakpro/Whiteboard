@@ -1,6 +1,6 @@
 /**
  * Action: Today (3), This Week (3), Next Moves, Milestones, Blockers, a daily
- * check-in, and the Startup Journey. Deliberately plain — no statuses,
+ * check-in, a calendar, and the Journal. Deliberately plain — no statuses,
  * scores or widgets beyond what the brainstorm → do → document loop needs.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -12,7 +12,8 @@ import { openContextMenu, type MenuItem } from "../shell/ContextMenu";
 import { ModeSwitch } from "../shell/ModeSwitch";
 import { BoardPicker } from "./BoardPicker";
 import { openLinkedBoard } from "./bridge";
-import { Journey } from "./Journey";
+import { Journal } from "./Journal";
+import { Calendar } from "./Calendar";
 import { computeSuggestions, type Suggestion } from "./suggest";
 import {
   addDays,
@@ -54,12 +55,17 @@ export function ActionView() {
           <button className={tab === "plan" ? "active" : ""} onClick={() => setApp({ actionTab: "plan" })}>
             Plan
           </button>
-          <button className={tab === "journey" ? "active" : ""} onClick={() => setApp({ actionTab: "journey" })}>
-            Journey
+          <button className={tab === "calendar" ? "active" : ""} onClick={() => setApp({ actionTab: "calendar" })}>
+            Calendar
+          </button>
+          <button className={tab === "journal" ? "active" : ""} onClick={() => setApp({ actionTab: "journal" })}>
+            Journal
           </button>
         </nav>
       </header>
-      <div className="action__scroll">{tab === "plan" ? <Plan /> : <Journey />}</div>
+      <div className="action__scroll">
+        {tab === "plan" ? <Plan /> : tab === "calendar" ? <Calendar /> : <Journal />}
+      </div>
     </div>
   );
 }
@@ -101,7 +107,7 @@ function Plan() {
       </div>
       {due && !checkingIn && (
         <div className="checkin-nudge">
-          Wrapping up? A 30-second check-in keeps your journey honest.
+          Wrapping up? A 30-second check-in keeps your journal honest.
           <button className="linkish" onClick={() => setCheckingIn(true)}>
             Check in
           </button>
@@ -264,6 +270,23 @@ function BoardChip({ item }: { item: ActionItem }) {
   );
 }
 
+/** "Due today" / "Due Fri" for scheduled next moves and blockers. */
+function DueChip({ item }: { item: ActionItem }) {
+  if (!item.date || (item.kind !== "move" && item.kind !== "blocker") || item.doneAt) return null;
+  const n = daysUntil(item.date);
+  const label =
+    n === 0
+      ? "Due today"
+      : n === 1
+        ? "Due tomorrow"
+        : n < 0
+          ? `${-n}d overdue`
+          : n < 7
+            ? `Due ${parseDay(item.date).toLocaleDateString(undefined, { weekday: "short" })}`
+            : `Due ${parseDay(item.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+  return <span className={`due-chip${n < 0 ? " late" : n === 0 ? " today" : ""}`}>{label}</span>;
+}
+
 function rowMenu(item: ActionItem, linkBoard: () => void): MenuItem[] {
   return [
     { label: item.boardPath ? "Change Linked Board…" : "Link to Board…", icon: Icon.board, onSelect: linkBoard },
@@ -283,6 +306,17 @@ function rowMenu(item: ActionItem, linkBoard: () => void): MenuItem[] {
           } as MenuItem,
         ]
       : []),
+    ...(item.kind === "move" || item.kind === "blocker"
+      ? [
+          "separator" as const,
+          { label: "Due Today", onSelect: () => updateItem(item.id, { date: dayKey() }) } as MenuItem,
+          { label: "Due Tomorrow", onSelect: () => updateItem(item.id, { date: addDays(dayKey(), 1) }) } as MenuItem,
+          { label: "Due Next Week", onSelect: () => updateItem(item.id, { date: addDays(weekKey(), 7) }) } as MenuItem,
+          ...(item.date
+            ? [{ label: "Clear Due Date", onSelect: () => updateItem(item.id, { date: null }) } as MenuItem]
+            : []),
+        ]
+      : []),
     "separator",
     { label: "Delete", icon: Icon.trash, danger: true, onSelect: () => removeItem(item.id) },
   ];
@@ -297,6 +331,7 @@ function ItemRow({ item, extra, doneLabel }: { item: ActionItem; extra?: React.R
       <div className="arow__main">
         <EditableTitle item={item} />
         <BoardChip item={item} />
+        <DueChip item={item} />
       </div>
       {extra}
       <button
@@ -344,6 +379,7 @@ function MoveRow({ item }: { item: ActionItem }) {
         )}
         <EditableTitle item={item} />
         <BoardChip item={item} />
+        <DueChip item={item} />
         {done && item.goal && !hasFollowUp && !item.goalDone && (
           <div className="followup">
             <input
@@ -470,7 +506,7 @@ function AddMove() {
       <input
         className="goal"
         value={goal}
-        placeholder="Goal (e.g. Launch beta)"
+        placeholder="Goal (e.g. Finish the essay)"
         onChange={(e) => setGoal(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && moveRef.current?.focus()}
       />
@@ -532,7 +568,7 @@ function CheckInForm({ onDone }: { onDone: () => void }) {
       return;
     }
     saveCheckIn({ moved: moved.trim(), tomorrow: tomorrow.trim(), blocking: blocking.trim() });
-    toast("Saved to your Startup Journey");
+    toast("Saved to your Journal");
     onDone();
   };
   return (

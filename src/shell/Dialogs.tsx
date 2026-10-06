@@ -7,7 +7,6 @@ import { addDays, addItem, dayKey, limitReason } from "../action/store";
 import { isMessyName } from "../action/suggest";
 import { exportToSvg, getNonDeletedElements } from "@excalidraw/excalidraw";
 import { parseScene } from "../editor/scene";
-import { DESIGN_TEMPLATES } from "../design/templates";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { getVersion } from "@tauri-apps/api/app";
 import { languages } from "@excalidraw/excalidraw";
@@ -34,7 +33,7 @@ export function Dialogs() {
     case "settings":
       return <SettingsDialog section={dialog.section} />;
     case "templates":
-      return <TemplatesDialog folder={dialog.folder} tab={dialog.tab} />;
+      return <TemplatesDialog folder={dialog.folder} />;
     case "shortcuts":
       return <ShortcutsDialog />;
     case "licenses":
@@ -355,24 +354,22 @@ function TemplatePreview({ id, build }: { id: string; build: () => Promise<strin
   return <div className="template__preview" ref={ref} />;
 }
 
-function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "brainstorm" | "design" }) {
-  const [tab, setTab] = useState(initialTab ?? "brainstorm");
+function TemplatesDialog({ folder }: { folder?: string }) {
   const [mine, setMine] = useState<Template[]>([]);
   const [busy, setBusy] = useState(false);
-  const style = useApp((s) => s.prefs.designStyle);
   const builtins = builtinTemplates();
   const reload = () => userTemplates().then(setMine, () => setMine([]));
   useEffect(() => {
     void reload();
   }, []);
 
-  const create = async (name: string | undefined, build: () => Promise<string> | string, design = false) => {
+  const create = async (name: string | undefined, build: () => Promise<string> | string) => {
     if (busy) return;
     setBusy(true);
     try {
       const content = await build();
       setApp({ dialog: null });
-      await newBoard({ folder, content, name, design });
+      await newBoard({ folder, content, name });
     } catch (e) {
       toast(`Couldn't use that template: ${e}`, "error");
     } finally {
@@ -382,95 +379,53 @@ function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "
 
   return (
     <Modal title="New Board" wide>
-      <div className="templates__tabs">
-        <div className="seg">
-          <button className={tab === "brainstorm" ? "active" : ""} onClick={() => setTab("brainstorm")}>
-            Brainstorm
+      <div className="templates">
+        {builtins.map((t) => (
+          <button
+            key={t.id}
+            className="template"
+            onClick={() => create(t.id === "blank" ? undefined : t.name, t.build)}
+          >
+            <TemplatePreview id={t.id} build={t.build} />
+            <span className="template__name">{t.name}</span>
+            <span className="template__desc">{t.description}</span>
           </button>
-          <button className={tab === "design" ? "active" : ""} onClick={() => setTab("design")}>
-            Design
-          </button>
-        </div>
-        {tab === "design" && (
-          <div className="seg small">
-            {(["clean", "sketchy"] as const).map((s) => (
-              <button key={s} className={style === s ? "active" : ""} onClick={() => setPref("designStyle", s)}>
-                {s === "clean" ? "Clean" : "Sketchy"}
-              </button>
-            ))}
-          </div>
-        )}
+        ))}
       </div>
-      {tab === "brainstorm" ? (
-        <>
-          <div className="templates">
-            {builtins.map((t) => (
-              <button
-                key={t.id}
-                className="template"
-                onClick={() => create(t.id === "blank" ? undefined : t.name, t.build)}
-              >
-                <TemplatePreview id={t.id} build={t.build} />
-                <span className="template__name">{t.name}</span>
-                <span className="template__desc">{t.description}</span>
-              </button>
-            ))}
-          </div>
-          <div className="templates__mine-title">
-            Your templates
-            <span className="muted small">Save any board with File → Save as Template</span>
-          </div>
-          {mine.length === 0 ? (
-            <div className="muted small templates__none">None yet.</div>
-          ) : (
-            <div className="templates">
-              {mine.map((t) => (
-                <div
-                  key={t.id}
-                  className="template"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => create(t.name, t.build)}
-                  onKeyDown={(e) => e.key === "Enter" && create(t.name, t.build)}
-                >
-                  <TemplatePreview id={t.id} build={t.build} />
-                  <span className="template__name">{t.name}</span>
-                  <span className="template__desc">{t.description}</span>
-                  <button
-                    className="icon-btn small template__remove"
-                    title="Remove template (moves it to Trash)"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      if (t.path) await trashPath(t.path);
-                      void reload();
-                    }}
-                  >
-                    {Icon.trash}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
+      <div className="templates__mine-title">
+        Your templates
+        <span className="muted small">Save any board with File → Save as Template</span>
+      </div>
+      {mine.length === 0 ? (
+        <div className="muted small templates__none">None yet.</div>
       ) : (
-        <>
-          <div className="templates">
-            {DESIGN_TEMPLATES.map((t) => {
-              const build = () => t.build(style);
-              return (
-                <button key={`${t.id}-${style}`} className="template" onClick={() => create(t.name, build, true)}>
-                  <TemplatePreview id={`${t.id}-${style}`} build={build} />
-                  <span className="template__name">{t.name}</span>
-                  <span className="template__desc">{t.description}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="settings__note">
-            Design boards add a <strong>Design</strong> panel (top right) with screens, buttons, inputs, cards and more
-            — click a piece to add it, or drag it in. Everything stays normal Excalidraw shapes.
-          </p>
-        </>
+        <div className="templates">
+          {mine.map((t) => (
+            <div
+              key={t.id}
+              className="template"
+              role="button"
+              tabIndex={0}
+              onClick={() => create(t.name, t.build)}
+              onKeyDown={(e) => e.key === "Enter" && create(t.name, t.build)}
+            >
+              <TemplatePreview id={t.id} build={t.build} />
+              <span className="template__name">{t.name}</span>
+              <span className="template__desc">{t.description}</span>
+              <button
+                className="icon-btn small template__remove"
+                title="Remove template (moves it to Trash)"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (t.path) await trashPath(t.path);
+                  void reload();
+                }}
+              >
+                {Icon.trash}
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </Modal>
   );
@@ -729,7 +684,7 @@ function SendToActionDialog(props: {
         {kind === "move" && (
           <label className="send__field">
             Goal
-            <input value={goal} placeholder="e.g. Launch beta" onChange={(e) => setGoal(e.target.value)} />
+            <input value={goal} placeholder="e.g. Finish the essay" onChange={(e) => setGoal(e.target.value)} />
           </label>
         )}
         <label className="send__field">

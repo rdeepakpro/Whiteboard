@@ -8,7 +8,6 @@ import {
   openBoard,
   reveal,
   setArchived,
-  setDesignBoard,
   toggleFavorite,
   trashPath,
 } from "../lib/boards";
@@ -57,11 +56,6 @@ export function boardMenu(path: string, opts: { inTree?: boolean } = {}): MenuIt
       onSelect: () => toggleFavorite(path),
     },
     { label: archived ? "Unarchive" : "Archive", icon: Icon.archive, onSelect: () => setArchived(path, !archived) },
-    {
-      label: s.designBoards.includes(path) ? "Hide Design Panel" : "Show Design Panel",
-      icon: Icon.design,
-      onSelect: () => setDesignBoard(path, !getApp().designBoards.includes(path)),
-    },
     {
       label: "Version History",
       icon: Icon.history,

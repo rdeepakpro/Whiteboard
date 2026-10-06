@@ -31,7 +31,7 @@ export function isInside(child: string, parent: string): boolean {
   return child === parent || child.startsWith(parent.endsWith(SEP) ? parent : parent + SEP);
 }
 
-/** Folder chain of `path` relative to `root`, e.g. ["Startup", "Product"]. */
+/** Folder chain of `path` relative to `root`, e.g. ["Work", "Ideas"]. */
 export function folderChain(path: string, root: string): string[] | null {
   if (!isInside(path, root)) return null;
   const rel = dirname(path).slice(root.length).replace(/^\/+/, "");

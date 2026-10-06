@@ -6,7 +6,7 @@
 
 <p align="center">
   A calm macOS home for your <a href="https://excalidraw.com">Excalidraw</a> boards.<br />
-  Brainstorm freely, sketch simple designs, and turn ideas into next moves. Local-first, no accounts.
+  Brainstorm freely, then plan what to do next. Local-first, no accounts.
 </p>
 
 ![Whiteboard — brainstorming on an Excalidraw canvas](docs/screenshots/brainstorm.png)
@@ -20,20 +20,18 @@
   that also looks inside boards.
 - **Never lose work.** Atomic autosave, local version history, and conflict
   detection when a file changes outside the app.
-- **Design boards.** A simple UI kit (screens, buttons, inputs, cards, nav
-  bars…) and ready-made screen templates for sketching app and web ideas.
-  It's not Figma: everything stays plain Excalidraw shapes.
 - **Visual references.** Paste a YouTube, Instagram or web link to get a
   preview card. Press ⇧⌘2 to drop a screenshot straight onto the board.
-- **Action.** A separate, deliberately small view: today's 3 priorities, the
-  week's outcomes, next moves, milestones, blockers, a daily check-in, and a
-  Startup Journey. Selections on a board can be sent to Action, with a link back.
+- **Action.** A separate, deliberately small planning view: today's 3
+  priorities, the week's outcomes, next moves, milestones, blockers, a
+  calendar of everything with a date, a daily check-in, and a Journal.
+  Selections on a board can be sent to Action, with a link back.
 - **Local and private.** Works offline. No accounts, cloud, analytics or AI by
   default.
 
-| Design boards                                                      | Action                                      |
-| ------------------------------------------------------------------ | ------------------------------------------- |
-| ![Design board with the Design panel](docs/screenshots/design.png) | ![Action view](docs/screenshots/action.png) |
+| Action — Plan                               | Action — Calendar                          |
+| ------------------------------------------- | ------------------------------------------ |
+| ![Action plan](docs/screenshots/action.png) | ![Calendar](docs/screenshots/calendar.png) |
 
 ## Install
 
@@ -44,32 +42,6 @@ Whiteboard.app → **Open** (or run
 `xattr -dr com.apple.quarantine /Applications/Whiteboard.app`).
 
 You can also build it yourself; see [Build](#build).
-
-## Design boards
-
-Press ⌥⌘D (or click **New Design** on Home) and pick a template: blank phone or
-desktop, sign-up screen, onboarding flow, landing page, dashboard, or settings.
-Each comes in a **Clean** or **Sketchy** look. Design boards show a **Design**
-button next to Excalidraw's Library. It opens a panel of about 36 pieces in six
-groups:
-
-- Screens
-- Navigation
-- Inputs
-- Content
-- Overlays
-- Notes
-
-- **Click** a piece to add it. If a screen is selected, the piece stacks
-  inside it below the existing content, so you can build a layout with a few
-  clicks.
-- **Drag** a piece to place it exactly. Pieces drop into frames natively.
-- **Add these to my Library** saves the kit as standard Excalidraw library
-  items.
-
-Any board can show or hide the panel from its ⋯ menu or ⌘K. Pieces are grouped
-Excalidraw shapes and text, so they edit, export and open in plain Excalidraw
-like anything else.
 
 ## Brainstorm and Action
 
@@ -84,11 +56,14 @@ control at the top-left (⇧⌘A):
   - **This Week**: up to 3 outcomes.
   - **Next Moves**: goal → one next action. When you finish a move, Whiteboard
     asks for the goal's next one, or you can mark the goal done.
-  - **Milestones**: a date with a countdown ("Beta Launch — 9 days").
+  - **Milestones**: a date with a countdown ("First draft — 9 days").
   - **Blockers**.
   - **Daily check-in**: three optional questions. After 6 PM (configurable)
     it's a quiet nudge in Action, never a popup.
-  - **Journey**: check-ins and finished items in date order, grouped by week
+  - **Calendar**: a month view of priorities planned for each day,
+    milestones, tasks with due dates, blockers, what you finished, and
+    journal entries. Click a day to see it in full or plan it.
+  - **Journal**: check-ins and finished items in date order, grouped by week
     with a one-line summary.
 
 **Brainstorm → Action**: select shapes, text or groups, then right-click →
@@ -107,7 +82,7 @@ its ⋯ menu; the picker suggests related boards.
   boards.
 - In Action, under "From your boards": to-dos found in your boards (`TODO:`,
   `Next:`, `[ ]`, `☐`).
-- Related boards in the board picker, and weekly summaries in the Journey.
+- Related boards in the board picker, and weekly summaries in the Journal.
 
 These are simple local rules over your boards' text. In Settings → Action you
 can optionally use a model running on this Mac via Ollama
@@ -172,8 +147,7 @@ Tauri 2 (Rust)                         Web frontend (React 19 + TypeScript + Vit
 │               trash, app paths       │               templates, exports, library, lifecycle
 ├─ search.rs    text index over boards ├─ state/       zustand store + state.json persistence
 ├─ webref.rs    link previews + cache  ├─ platform/    IPC wrappers + native file pickers
-│                                      ├─ design/      Design kit, panel, design templates
-│                                      └─ action/      Action view, suggestions, Journey
+│                                      └─ action/      Action view, calendar, suggestions, Journal
 ├─ capture.rs   screenshots, clipboard image, ⇧⌘2
 └─ menu.rs      native macOS menu bar
 ```

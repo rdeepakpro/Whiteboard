@@ -126,9 +126,6 @@ function HomePage() {
           <button className="btn large" onClick={() => openWithDialog()}>
             {Icon.folderOpen} Open…
           </button>
-          <button className="btn large" onClick={() => runCommand("new-design")}>
-            {Icon.design} New Design
-          </button>
           <button className="btn large" onClick={() => runCommand("new-from-template")}>
             {Icon.template} From Template
           </button>
@@ -147,8 +144,8 @@ function HomePage() {
       )}
       <TidyUp />
       <div className="home__hint">
-        <kbd>⌘N</kbd> new board <span className="sep">·</span> <kbd>⌥⌘D</kbd> new design <span className="sep">·</span>{" "}
-        <kbd>⌘K</kbd> search <span className="sep">·</span> <kbd>⇧⌘A</kbd> Action
+        <kbd>⌘N</kbd> new board <span className="sep">·</span> <kbd>⌘K</kbd> search <span className="sep">·</span>{" "}
+        <kbd>⇧⌘A</kbd> Action
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 /**
- * Startup Journey: a chronological record built from daily check-ins and
+ * Journal: a chronological record built from daily check-ins and
  * finished items, grouped by week with a one-line summary (rule-based, or
  * from the optional local model).
  */
@@ -27,7 +27,7 @@ interface Day {
   done: ActionItem[];
 }
 
-export function Journey() {
+export function Journal() {
   const items = useAction((s) => s.items);
   const checkIns = useAction((s) => s.checkIns);
 
@@ -50,8 +50,8 @@ export function Journey() {
 
   if (!weeks.length) {
     return (
-      <div className="journey empty">
-        <h1>Startup Journey</h1>
+      <div className="journal empty">
+        <h1>Journal</h1>
         <p>
           Your daily check-ins and everything you finish will collect here, in order — a quiet record of how the company
           got built.
@@ -61,8 +61,8 @@ export function Journey() {
   }
 
   return (
-    <div className="journey">
-      <h1>Startup Journey</h1>
+    <div className="journal">
+      <h1>Journal</h1>
       {weeks.map(([wk, days]) => (
         <Week key={wk} weekStart={wk} days={days} />
       ))}

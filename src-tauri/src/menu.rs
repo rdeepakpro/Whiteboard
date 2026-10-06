@@ -132,13 +132,6 @@ pub fn build<R: Runtime>(app: &AppHandle<R>, state: &MenuState) -> tauri::Result
         )?)
         .item(&item(
             app,
-            "new-design",
-            "New Design…",
-            Some("CmdOrCtrl+Alt+D"),
-            true,
-        )?)
-        .item(&item(
-            app,
             "new-folder",
             "New Folder",
             Some("CmdOrCtrl+Shift+N"),
@@ -290,7 +283,6 @@ pub fn build<R: Runtime>(app: &AppHandle<R>, state: &MenuState) -> tauri::Result
             Some("CmdOrCtrl+Shift+F"),
             true,
         )?)
-        .item(&item(app, "toggle-design", "Design Panel", None, b)?)
         .separator()
         .item(&item(app, "zoom-in", "Zoom In", Some("CmdOrCtrl+="), b)?)
         .item(&item(app, "zoom-out", "Zoom Out", Some("CmdOrCtrl+-"), b)?)
