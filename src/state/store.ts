@@ -35,6 +35,9 @@ export interface Prefs {
   /** Optional local model (Ollama on this Mac) for names and summaries. */
   localAiEnabled: boolean;
   localAiModel: string;
+  /** Design kit look and whether its panel stays docked. */
+  designStyle: "clean" | "sketchy";
+  designDocked: boolean;
 }
 
 export const DEFAULT_PREFS: Omit<Prefs, "libraryRoot"> = {
@@ -54,6 +57,8 @@ export const DEFAULT_PREFS: Omit<Prefs, "libraryRoot"> = {
   checkInHour: 18,
   localAiEnabled: false,
   localAiModel: "",
+  designStyle: "clean",
+  designDocked: true,
 };
 
 export type Mode = "brainstorm" | "action";
@@ -97,7 +102,7 @@ export type Dialog =
       itemKind?: "priority" | "move" | "milestone" | "blocker";
     }
   | { kind: "settings"; section?: string }
-  | { kind: "templates"; folder?: string }
+  | { kind: "templates"; folder?: string; tab?: "brainstorm" | "design" }
   | { kind: "shortcuts" }
   | { kind: "licenses" };
 
@@ -115,6 +120,7 @@ export interface PersistedState {
   sidebarWidth: number;
   sidebarCollapsed: boolean;
   mode: Mode;
+  designBoards: string[];
 }
 
 export interface AppState {
@@ -132,6 +138,8 @@ export interface AppState {
   archived: string[];
   recents: Recent[];
   expanded: Record<string, boolean>;
+  /** Boards that show the Design panel. */
+  designBoards: string[];
 
   tabs: Tab[];
   activeTabId: string | null;
@@ -168,6 +176,7 @@ export const useApp = create<AppState>(() => ({
   archived: [],
   recents: [],
   expanded: {},
+  designBoards: [],
   tabs: [],
   activeTabId: null,
   mounted: {},

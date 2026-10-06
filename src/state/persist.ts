@@ -48,6 +48,7 @@ export function snapshotState(): PersistedState {
     sidebarWidth: s.sidebarWidth,
     sidebarCollapsed: s.sidebarCollapsed,
     mode: s.mode,
+    designBoards: s.designBoards,
   };
 }
 
@@ -90,6 +91,7 @@ export function mergeDefaults(p: Partial<PersistedState> | null, defaultRoot: st
     sidebarWidth: p?.sidebarWidth ?? DEFAULT_SIDEBAR_WIDTH,
     sidebarCollapsed: p?.sidebarCollapsed ?? false,
     mode: p?.mode ?? ("brainstorm" as const),
+    designBoards: p?.designBoards ?? [],
     closedStack: p?.closedStack ?? [],
     tabs: p?.tabs ?? [],
     activePath: p?.activePath ?? null,

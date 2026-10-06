@@ -4,14 +4,16 @@
  *  - file actions in the main menu point at Whiteboard's native Open/Save As
  *    (Excalidraw's browser-download versions are disabled via UIOptions)
  *  - the welcome screen shows Excalidraw's hints without the web-app branding
+ *  - Design boards get a "Design" sidebar (Excalidraw's own Sidebar API)
  */
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { Excalidraw, MainMenu, WelcomeScreen, getCommonBounds } from "@excalidraw/excalidraw";
+import { Excalidraw, MainMenu, Sidebar, WelcomeScreen, getCommonBounds } from "@excalidraw/excalidraw";
+import { DESIGN_SIDEBAR, DesignPanel, designIcon } from "../design/DesignPanel";
 import type { ExcalidrawImperativeAPI, ExcalidrawInitialDataState, UIOptions } from "@excalidraw/excalidraw/types";
 import { BoardSession } from "./BoardSession";
 import { sessions, focusEditor } from "./registry";
 export { focusEditor };
-import { getApp, setApp, setTabStatus } from "../state/store";
+import { getApp, setApp, setTabStatus, useApp } from "../state/store";
 import { schedulePersist, viewports } from "../state/persist";
 import { libraryItems, onLibraryChange } from "../lib/library";
 import { setLiveStats } from "../lib/liveStats";
@@ -20,6 +22,8 @@ import { closeTab, openWithDialog, saveAs, reveal } from "../lib/boards";
 import { Icon } from "../shell/icons";
 
 const UI_OPTIONS: Partial<UIOptions> = {
+  // Let sidebars (Library, Design) dock beside the canvas on laptop screens.
+  dockedSidebarBreakpoint: 1000,
   canvasActions: {
     loadScene: false, // replaced by native Open… (Cmd+O)
     saveToActiveFile: false, // Whiteboard autosaves to the board's file
@@ -52,6 +56,16 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
   const [attempt, setAttempt] = useState(0);
   const activeRef = useRef(active);
   activeRef.current = active;
+  const isDesign = useApp((s) => s.designBoards.includes(path));
+  const isDesignRef = useRef(isDesign);
+  isDesignRef.current = isDesign;
+
+  // Open the Design panel when a board becomes a Design board (or opens as one).
+  useEffect(() => {
+    if (!isDesign || !session.api || window.innerWidth < 1000) return;
+    const id = window.setTimeout(() => session.api?.toggleSidebar({ name: DESIGN_SIDEBAR, force: true }), 150);
+    return () => window.clearTimeout(id);
+  }, [isDesign, session, load.status]);
   const themeRef = useRef(theme);
   themeRef.current = theme;
   const lastSeenTheme = useRef<string | null>(null);
@@ -120,6 +134,9 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
     () => ({
       excalidrawAPI: (api: any) => {
         session.attach(api);
+        if (isDesignRef.current && window.innerWidth >= 1000) {
+          window.setTimeout(() => api.toggleSidebar({ name: DESIGN_SIDEBAR, force: true }), 150);
+        }
         if (!viewports[session.path]) window.setTimeout(() => fitIfLarger(api), 60);
         if (activeRef.current) window.setTimeout(() => pushStats(session), 0);
       },
@@ -175,6 +192,7 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
       onScrollChange={handlers.onScrollChange}
       onLibraryChange={handlers.onLibraryChange}
       onPointerUpdate={handlers.onPointerUpdate}
+      renderTopRightUI={isDesign ? renderDesignTrigger : undefined}
       theme={theme}
       langCode={langCode}
       name={boardName(path)}
@@ -201,6 +219,7 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
         <MainMenu.DefaultItems.ToggleTheme />
         <MainMenu.DefaultItems.ChangeCanvasBackground />
       </MainMenu>
+      {isDesign && <DesignPanel getApi={() => session.api} />}
       <WelcomeScreen>
         <WelcomeScreen.Hints.MenuHint />
         <WelcomeScreen.Hints.ToolbarHint />
@@ -209,6 +228,14 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
     </Excalidraw>
   );
 });
+
+function renderDesignTrigger() {
+  return (
+    <Sidebar.Trigger name={DESIGN_SIDEBAR} icon={designIcon} title="Design kit" className="wb-design-trigger">
+      Design
+    </Sidebar.Trigger>
+  );
+}
 
 /** First open of a board: zoom out to fit if it's bigger than the window. */
 function fitIfLarger(api: ExcalidrawImperativeAPI) {

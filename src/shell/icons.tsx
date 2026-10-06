@@ -57,5 +57,9 @@ export const Icon = {
   keyboard: svg([<rect key="a" x="2.5" y="5" width="15" height="10" rx="2" />, <path key="b" d="M5.5 8h.01M8.5 8h.01M11.5 8h.01M14.5 8h.01M6.5 12h7" />]),
   sun: svg([<circle key="a" cx="10" cy="10" r="3" />, <path key="b" d="M10 2.5v1.5M10 16v1.5M2.5 10H4M16 10h1.5M4.7 4.7l1 1M14.3 14.3l1 1M4.7 15.3l1-1M14.3 5.7l1-1" />]),
   image: svg([<rect key="a" x="3" y="4" width="14" height="12" rx="2" />, <circle key="b" cx="7.5" cy="8.5" r="1.3" />, <path key="c" d="m3.5 14 4-3.5 3 2.5 2.5-2 3.5 3" />]),
+  design: svg([
+    <rect key="a" x="2.5" y="3.5" width="15" height="13" rx="2" />,
+    <path key="b" d="M2.5 7h15M6 10.5h4M6 13h6" />,
+  ]),
   link: svg(<path d="M8.5 11.5a3 3 0 0 0 4.2 0l2.6-2.6a3 3 0 0 0-4.2-4.2L10 5.8m1.5 2.7a3 3 0 0 0-4.2 0l-2.6 2.6a3 3 0 0 0 4.2 4.2L10 14.2" />),
 };

@@ -112,6 +112,9 @@ function HomePage() {
           <button className="btn large" onClick={() => openWithDialog()}>
             {Icon.folderOpen} Open…
           </button>
+          <button className="btn large" onClick={() => runCommand("new-design")}>
+            {Icon.design} New Design
+          </button>
           <button className="btn large" onClick={() => runCommand("new-from-template")}>
             {Icon.template} From Template
           </button>

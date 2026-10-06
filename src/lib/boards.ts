@@ -181,12 +181,13 @@ export function targetFolder(): string {
   return s.prefs.newBoardFolder && isInside(s.prefs.newBoardFolder, root()) ? s.prefs.newBoardFolder : root();
 }
 
-export async function newBoard(opts: { folder?: string; content?: string; name?: string } = {}) {
+export async function newBoard(opts: { folder?: string; content?: string; name?: string; design?: boolean } = {}) {
   if (getApp().mode !== "brainstorm") setApp({ mode: "brainstorm" });
   const folder = opts.folder ?? targetFolder();
   try {
     const path = await ipc.uniquePath(folder, sanitizeName(opts.name || DEFAULT_BOARD_NAME), EXT);
     await ipc.createBoard(path, opts.content ?? emptySceneJSON());
+    if (opts.design) setApp((s) => ({ designBoards: [...new Set([...s.designBoards, path])] }));
     if (isInside(folder, root()) && folder !== root()) setApp((s) => ({ expanded: { ...s.expanded, [folder]: true } }));
     await refreshTree();
     await openBoard(path);
@@ -237,6 +238,7 @@ async function applyPathChange(from: string, to: string, boardPairs: [string, st
   setApp((s) => ({
     tabs: s.tabs.map((t) => ({ ...t, path: rb(t.path) })),
     favorites: s.favorites.map(rb),
+    designBoards: s.designBoards.map(rb),
     archived: s.archived.map(rb),
     recents: s.recents.map((r) => ({ ...r, path: rb(r.path) })),
     closedStack: s.closedStack.map(rb),
@@ -301,6 +303,7 @@ export async function duplicateBoard(path: string) {
   try {
     const to = await ipc.uniquePath(dirname(path), `${boardName(path)} copy`, EXT);
     await ipc.copyFile(path, to);
+    if (getApp().designBoards.includes(path)) setDesignBoard(to, true);
     await refreshTree();
     setApp({ selected: to });
     return to;
@@ -311,6 +314,14 @@ export async function duplicateBoard(path: string) {
 }
 
 // ---------------------------------------------------- archive & trash
+
+/** Shows or hides the Design panel for a board. */
+export function setDesignBoard(path: string, on: boolean) {
+  setApp((s) => ({
+    designBoards: on ? [...new Set([...s.designBoards, path])] : s.designBoards.filter((p) => p !== path),
+  }));
+  schedulePersist();
+}
 
 export function toggleFavorite(path: string) {
   setApp((s) => ({

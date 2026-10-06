@@ -25,6 +25,7 @@ import {
   reopenClosed,
   reveal,
   saveActive,
+  setDesignBoard,
   saveAs,
   saveAsTemplate,
 } from "./boards";
@@ -107,6 +108,18 @@ function editOrForward(execName: string, init: KeyboardEventInit) {
 export const commands: Command[] = [
   { id: "new-board", title: "New Board", shortcut: "⌘N", palette: true, keywords: "create", run: () => newBoard() },
   { id: "new-from-template", title: "New Board from Template…", shortcut: "⌥⌘N", palette: true, keywords: "template mind map swot flow", run: () => setApp({ dialog: { kind: "templates" } }) },
+  { id: "new-design", title: "New Design…", shortcut: "⌥⌘D", palette: true, keywords: "wireframe mockup ui screen app layout design kit", run: () => setApp({ dialog: { kind: "templates", tab: "design" } }) },
+  {
+    id: "toggle-design",
+    title: "Show/Hide Design Panel for This Board",
+    palette: true,
+    needsBoard: true,
+    keywords: "design kit wireframe components ui",
+    run: () => {
+      const t = activeTab();
+      if (t) setDesignBoard(t.path, !getApp().designBoards.includes(t.path));
+    },
+  },
   { id: "new-folder", title: "New Folder", shortcut: "⇧⌘N", palette: true, keywords: "workspace create", run: () => newFolder() },
   { id: "open", title: "Open File…", shortcut: "⌘O", palette: true, keywords: "import excalidraw", run: openWithDialog },
   { id: "save", title: "Save", shortcut: "⌘S", needsBoard: true, run: saveActive },
@@ -205,6 +218,7 @@ const KEYMAP: Record<string, string> = {
   "mod+n": "new-board",
   "mod+t": "new-board",
   "mod+alt+n": "new-from-template",
+  "mod+alt+d": "new-design",
   "mod+shift+n": "new-folder",
   "mod+o": "open",
   "mod+s": "save",

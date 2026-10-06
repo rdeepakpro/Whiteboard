@@ -2065,3 +2065,187 @@ button.section-header__label:not(:disabled):hover {
 .crash p {
   margin: 6px 0 14px;
 }
+
+/* ------------------------------------------------------------------ Design */
+
+.templates__tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 0;
+}
+.templates__tabs .seg {
+  width: 240px;
+}
+.templates__tabs .seg.small {
+  width: 170px;
+}
+.template__preview {
+  width: 100%;
+  height: 112px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 8px;
+}
+.template__preview svg {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+/* Design panel lives inside Excalidraw's sidebar; inherit its look. */
+.wb-design-trigger {
+  margin-right: 6px;
+}
+.wb-kit__title {
+  font-weight: 600;
+  font-size: 15px;
+}
+.wb-kit {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  font-family: var(--ui-font, inherit);
+}
+.wb-kit__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 10px;
+}
+.wb-kit__seg {
+  display: flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--color-surface-low, rgba(0, 0, 0, 0.05));
+}
+.wb-kit__seg button {
+  flex: 1;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-on-surface, inherit);
+  opacity: 0.7;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.wb-kit__seg button.active {
+  opacity: 1;
+  background: var(--island-bg-color, #fff);
+  box-shadow: 0 0 0 1px var(--default-border-color, rgba(0, 0, 0, 0.1));
+}
+.wb-kit__search {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--default-border-color, rgba(0, 0, 0, 0.12));
+  background: var(--input-bg-color, transparent);
+  color: var(--text-primary-color, inherit);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.wb-kit__search:focus {
+  border-color: var(--color-primary, #6965db);
+}
+.wb-kit__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 4px 12px;
+}
+.wb-kit__cat {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin: 12px 2px 6px;
+}
+.wb-kit__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.wb-kit__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--default-border-color, rgba(0, 0, 0, 0.1));
+  background: var(--island-bg-color, #fff);
+  color: var(--text-primary-color, inherit);
+  cursor: grab;
+  font: inherit;
+}
+.wb-kit__tile:hover {
+  border-color: var(--color-primary, #6965db);
+}
+.wb-kit__tile:active {
+  cursor: grabbing;
+}
+.wb-kit__preview {
+  height: 64px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.wb-kit__preview svg {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+.excalidraw.theme--dark .wb-kit__preview svg {
+  filter: invert(93%) hue-rotate(180deg);
+}
+.wb-kit__name {
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wb-kit__empty {
+  padding: 16px 4px;
+  opacity: 0.6;
+  font-size: 13px;
+}
+.wb-kit__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.wb-kit__link {
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-primary, #6965db);
+  cursor: pointer;
+}
+.modal .templates {
+  min-height: 0;
+  flex: 0 1 auto;
+}

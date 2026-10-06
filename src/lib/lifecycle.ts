@@ -45,6 +45,7 @@ export async function bootstrap() {
     sidebarWidth: m.sidebarWidth,
     sidebarCollapsed: m.sidebarCollapsed,
     mode: m.mode,
+    designBoards: m.designBoards,
     closedStack: m.closedStack,
     tabs,
     activeTabId,
@@ -203,6 +204,7 @@ function installListeners() {
       s.sidebarWidth !== prev.sidebarWidth ||
       s.sidebarCollapsed !== prev.sidebarCollapsed ||
       s.mode !== prev.mode ||
+      s.designBoards !== prev.designBoards ||
       s.prefs !== prev.prefs
     ) {
       schedulePersist();
