@@ -444,8 +444,16 @@ mod tests {
         // Same mtime: allowed.
         let m2 = write_board(path.clone(), SCENE.into(), Some(m1)).unwrap();
         // Stale mtime: refused, file untouched.
-        std::thread::sleep(std::time::Duration::from_millis(5));
         fs::write(&p, SCENE.replace("[]", "[ ]")).unwrap();
+        // Set the mtime explicitly: coarse filesystem clocks (CI VMs) can
+        // otherwise leave it unchanged.
+        let later = std::time::UNIX_EPOCH + std::time::Duration::from_millis(m2 + 2_000);
+        fs::File::options()
+            .write(true)
+            .open(&p)
+            .unwrap()
+            .set_modified(later)
+            .unwrap();
         let err = write_board(path.clone(), SCENE.into(), Some(m2)).unwrap_err();
         assert!(err.starts_with("CONFLICT"), "{err}");
         assert!(fs::read_to_string(&p).unwrap().contains("[ ]"));
