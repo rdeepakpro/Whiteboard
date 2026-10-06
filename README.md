@@ -1,11 +1,165 @@
-# Whiteboard
+<p align="center">
+  <img src="assets/app-icon.svg" width="96" alt="Whiteboard icon" />
+</p>
 
-A personal macOS desktop app for brainstorming. Each board is the real
-[Excalidraw](https://github.com/excalidraw/excalidraw) editor; Whiteboard adds
-a quiet desktop workspace around it: folders, tabs, recents, favorites,
-search, version history, autosave and native file handling.
+<h1 align="center">Whiteboard</h1>
 
-Everything is local. There are no accounts, servers, sync or AI features.
+<p align="center">
+  A calm macOS home for your <a href="https://excalidraw.com">Excalidraw</a> boards.<br />
+  Brainstorm freely, sketch simple designs, and turn ideas into next moves. Local-first, no accounts.
+</p>
+
+![Whiteboard — brainstorming on an Excalidraw canvas](docs/screenshots/brainstorm.png)
+
+## Features
+
+- **The real Excalidraw editor.** It uses the official `@excalidraw/excalidraw`
+  package, unmodified, with the same tools, shortcuts, libraries and file format.
+- **Your boards, organized.** Workspaces and folders (ordinary Finder
+  folders), tabs, favorites, recents, archive, trash, thumbnails, and ⌘K search
+  that also looks inside boards.
+- **Never lose work.** Atomic autosave, local version history, and conflict
+  detection when a file changes outside the app.
+- **Design boards.** A simple UI kit (screens, buttons, inputs, cards, nav
+  bars…) and ready-made screen templates for sketching app and web ideas.
+  It's not Figma: everything stays plain Excalidraw shapes.
+- **Visual references.** Paste a YouTube, Instagram or web link to get a
+  preview card. Press ⇧⌘2 to drop a screenshot straight onto the board.
+- **Action.** A separate, deliberately small view: today's 3 priorities, the
+  week's outcomes, next moves, milestones, blockers, a daily check-in, and a
+  Startup Journey. Selections on a board can be sent to Action, with a link back.
+- **Local and private.** Works offline. No accounts, cloud, analytics or AI by
+  default.
+
+| Design boards                                                      | Action                                      |
+| ------------------------------------------------------------------ | ------------------------------------------- |
+| ![Design board with the Design panel](docs/screenshots/design.png) | ![Action view](docs/screenshots/action.png) |
+
+## Install
+
+Download `Whiteboard_*_aarch64.dmg` from
+[Releases](../../releases) (Apple Silicon), open it, and drag Whiteboard to
+Applications. Builds are not notarized. On first launch, right-click
+Whiteboard.app → **Open** (or run
+`xattr -dr com.apple.quarantine /Applications/Whiteboard.app`).
+
+You can also build it yourself; see [Build](#build).
+
+## Design boards
+
+Press ⌥⌘D (or click **New Design** on Home) and pick a template: blank phone or
+desktop, sign-up screen, onboarding flow, landing page, dashboard, or settings.
+Each comes in a **Clean** or **Sketchy** look. Design boards show a **Design**
+button next to Excalidraw's Library. It opens a panel of about 36 pieces in six
+groups:
+
+- Screens
+- Navigation
+- Inputs
+- Content
+- Overlays
+- Notes
+
+- **Click** a piece to add it. If a screen is selected, the piece stacks
+  inside it below the existing content, so you can build a layout with a few
+  clicks.
+- **Drag** a piece to place it exactly. Pieces drop into frames natively.
+- **Add these to my Library** saves the kit as standard Excalidraw library
+  items.
+
+Any board can show or hide the panel from its ⋯ menu or ⌘K. Pieces are grouped
+Excalidraw shapes and text, so they edit, export and open in plain Excalidraw
+like anything else.
+
+## Brainstorm and Action
+
+Whiteboard has two separate sides, switched with the **Brainstorm | Action**
+control at the top-left (⇧⌘A):
+
+- **Brainstorm** is the Excalidraw workspace, unchanged. There's no task UI on
+  the canvas.
+- **Action** is a plain execution view:
+  - **Today**: up to 3 priorities. Unfinished ones from earlier days wait
+    under "Unfinished from earlier" until you move them to today.
+  - **This Week**: up to 3 outcomes.
+  - **Next Moves**: goal → one next action. When you finish a move, Whiteboard
+    asks for the goal's next one, or you can mark the goal done.
+  - **Milestones**: a date with a countdown ("Beta Launch — 9 days").
+  - **Blockers**.
+  - **Daily check-in**: three optional questions. After 6 PM (configurable)
+    it's a quiet nudge in Action, never a popup.
+  - **Journey**: check-ins and finished items in date order, grouped by week
+    with a one-line summary.
+
+**Brainstorm → Action**: select shapes, text or groups, then right-click →
+_Send to Action…_ (added to Excalidraw's own menu), ⌥⌘A, or ⌘K → _Make
+Priority / Next Move / Milestone / Blocker_. The item keeps a link to the
+board _and the exact shapes_.
+
+**Action → Brainstorm**: click an item's board chip to open the board with
+those shapes selected and centered. Any item can be linked to a board from
+its ⋯ menu; the picker suggests related boards.
+
+**Suggestions** (never applied without a click):
+
+- On Home, under "Tidy up": cleaner names for messy boards
+  (`Untitled Whiteboard 7` → `Onboarding Flow`) and folder moves for loose
+  boards.
+- In Action, under "From your boards": to-dos found in your boards (`TODO:`,
+  `Next:`, `[ ]`, `☐`).
+- Related boards in the board picker, and weekly summaries in the Journey.
+
+These are simple local rules over your boards' text. In Settings → Action you
+can optionally use a model running on this Mac via Ollama
+(`127.0.0.1:11434`) for board names and weekly summaries. It's off by default,
+and nothing leaves your computer.
+
+Action data lives in `…/com.local.whiteboard/action.json` (plus `.bak`) and
+is never written into `.excalidraw` files.
+
+## Visual references and screenshots
+
+- **Paste a link** onto the canvas (⌘V), drop one from a browser, or use
+  ⌘K → _Insert Web Reference_ / `/embed <url>`. YouTube, Instagram and other
+  websites become a compact card made of ordinary Excalidraw elements
+  (rounded rectangle, thumbnail image, text), grouped together. Cards save in
+  the `.excalidraw` file and appear in PNG/SVG exports. Each element stores
+  `customData.wbRef = { cardId, url, kind, role }` (Excalidraw's official
+  metadata field), and the card's rectangle has a standard Excalidraw `link`,
+  so the link still works in plain Excalidraw.
+- **Open a card** by double-clicking it or clicking Excalidraw's link icon.
+  Clicking or dragging never opens it. Right-click a card for Open Link, Copy
+  URL, Refresh Preview, Duplicate, Remove Preview, Convert to Plain Link and
+  Delete.
+- **Screenshots**: ⇧⌘2 (works system-wide; you can turn that off in Settings →
+  Capture), ⌘K → _Capture Screenshot / Window / Full Screen_, or `/shot`.
+  This uses macOS's own selection UI: drag a region, press Space for window
+  mode, or Esc to cancel. The image is inserted into the active board as a
+  normal Excalidraw image and stored inside the board file. The temp file is
+  deleted at once, and nothing is saved to the Desktop. macOS requires the
+  **Screen Recording** permission for this. Whiteboard asks once and then
+  links to System Settings. Unsigned local builds may need the permission
+  granted again after a rebuild.
+- **Clipboard images**: ⌘V works as in Excalidraw (also when the pointer isn't
+  over the canvas). ⌘K → _Insert Image from Clipboard_ (or `/paste`) reads the
+  macOS clipboard directly.
+
+### Remote requests (privacy)
+
+Whiteboard makes network requests **only when you insert or refresh a link**:
+
+| Link           | Requests                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| YouTube        | `youtube.com/oembed` (YouTube's documented public endpoint: title and channel) and the video thumbnail from `i.ytimg.com`                                                                              |
+| Instagram      | one GET of the post page to read Open Graph tags. Instagram usually returns none without a login, so you get a clean fallback card. Whiteboard doesn't log in, use tokens, or pretend to be a crawler. |
+| Any other site | one GET of the page (title / Open Graph tags), its preview image, and its favicon                                                                                                                      |
+
+If a site can't be resolved, a DNS lookup of `apple.com` (no HTTP request)
+distinguishes "offline" from "site unreachable". Board contents are never
+sent anywhere, and there are no analytics. Previews are cached in
+`…/com.local.whiteboard/link-cache/`, and the thumbnail is embedded in the
+board, so existing cards look the same offline. A link pasted while offline
+becomes a basic card ("Preview unavailable offline") with no retries.
 
 ## Architecture
 
@@ -17,7 +171,9 @@ Tauri 2 (Rust)                         Web frontend (React 19 + TypeScript + Vit
 ├─ appdata.rs   history, thumbnails,   ├─ lib/         board operations, commands/shortcuts,
 │               trash, app paths       │               templates, exports, library, lifecycle
 ├─ search.rs    text index over boards ├─ state/       zustand store + state.json persistence
-├─ webref.rs    link previews + cache  └─ platform/    IPC wrappers + native file pickers
+├─ webref.rs    link previews + cache  ├─ platform/    IPC wrappers + native file pickers
+│                                      ├─ design/      Design kit, panel, design templates
+│                                      └─ action/      Action view, suggestions, Journey
 ├─ capture.rs   screenshots, clipboard image, ⇧⌘2
 └─ menu.rs      native macOS menu bar
 ```
@@ -61,109 +217,20 @@ Tauri 2 (Rust)                         Web frontend (React 19 + TypeScript + Vit
   for search, so "Add Link to Selection" is available from the ⌘K palette (and
   from Excalidraw's element toolbar).
 
-## Brainstorm and Action
-
-Whiteboard has two separate sides, switched with the **Brainstorm | Action**
-control at the top-left (⇧⌘A):
-
-- **Brainstorm** is the Excalidraw workspace, unchanged. There's no task UI on
-  the canvas.
-- **Action** is a plain execution view:
-  - **Today**: up to 3 priorities. Unfinished ones from earlier days wait
-    under "Unfinished from earlier" until you move them to today.
-  - **This Week**: up to 3 outcomes.
-  - **Next Moves**: goal → one next action. When you finish a move, Whiteboard
-    asks for the goal's next one, or you can mark the goal done.
-  - **Milestones**: a date with a countdown ("Beta Launch — 9 days").
-  - **Blockers**.
-  - **Daily check-in**: three optional questions. After 6 PM (configurable)
-    it's a quiet nudge in Action, never a popup.
-  - **Journey**: check-ins and finished items in date order, grouped by week
-    with a one-line summary.
-
-**Brainstorm → Action**: select shapes, text or groups, then right-click →
-*Send to Action…* (added to Excalidraw's own menu), ⌥⌘A, or ⌘K → *Make
-Priority / Next Move / Milestone / Blocker*. The item keeps a link to the
-board *and the exact shapes*.
-
-**Action → Brainstorm**: click an item's board chip to open the board with
-those shapes selected and centered. Any item can be linked to a board from
-its ⋯ menu; the picker suggests related boards.
-
-**Suggestions** (never applied without a click):
-- On Home, under "Tidy up": cleaner names for messy boards
-  (`Untitled Whiteboard 7` → `Onboarding Flow`) and folder moves for loose
-  boards.
-- In Action, under "From your boards": to-dos found in your boards (`TODO:`,
-  `Next:`, `[ ]`, `☐`).
-- Related boards in the board picker, and weekly summaries in the Journey.
-
-These are simple local rules over your boards' text. In Settings → Action you
-can optionally use a model running on this Mac via Ollama
-(`127.0.0.1:11434`) for board names and weekly summaries. It's off by default,
-and nothing leaves your computer.
-
-Action data lives in `…/com.local.whiteboard/action.json` (plus `.bak`) and
-is never written into `.excalidraw` files.
-
-## Visual references and screenshots
-
-- **Paste a link** onto the canvas (⌘V), drop one from a browser, or use
-  ⌘K → *Insert Web Reference* / `/embed <url>`. YouTube, Instagram and other
-  websites become a compact card made of ordinary Excalidraw elements
-  (rounded rectangle, thumbnail image, text), grouped together. Cards save in
-  the `.excalidraw` file and appear in PNG/SVG exports. Each element stores
-  `customData.wbRef = { cardId, url, kind, role }` (Excalidraw's official
-  metadata field), and the card's rectangle has a standard Excalidraw `link`,
-  so the link still works in plain Excalidraw.
-- **Open a card** by double-clicking it or clicking Excalidraw's link icon.
-  Clicking or dragging never opens it. Right-click a card for Open Link, Copy
-  URL, Refresh Preview, Duplicate, Remove Preview, Convert to Plain Link and
-  Delete.
-- **Screenshots**: ⇧⌘2 (works system-wide; you can turn that off in Settings →
-  Capture), ⌘K → *Capture Screenshot / Window / Full Screen*, or `/shot`.
-  This uses macOS's own selection UI: drag a region, press Space for window
-  mode, or Esc to cancel. The image is inserted into the active board as a
-  normal Excalidraw image and stored inside the board file. The temp file is
-  deleted at once, and nothing is saved to the Desktop. macOS requires the
-  **Screen Recording** permission for this. Whiteboard asks once and then
-  links to System Settings. Unsigned local builds may need the permission
-  granted again after a rebuild.
-- **Clipboard images**: ⌘V works as in Excalidraw (also when the pointer isn't
-  over the canvas). ⌘K → *Insert Image from Clipboard* (or `/paste`) reads the
-  macOS clipboard directly.
-
-### Remote requests (privacy)
-
-Whiteboard makes network requests **only when you insert or refresh a link**:
-
-| Link | Requests |
-| --- | --- |
-| YouTube | `youtube.com/oembed` (YouTube's documented public endpoint: title and channel) and the video thumbnail from `i.ytimg.com` |
-| Instagram | one GET of the post page to read Open Graph tags. Instagram usually returns none without a login, so you get a clean fallback card. Whiteboard doesn't log in, use tokens, or pretend to be a crawler. |
-| Any other site | one GET of the page (title / Open Graph tags), its preview image, and its favicon |
-
-If a site can't be resolved, a DNS lookup of `apple.com` (no HTTP request)
-distinguishes "offline" from "site unreachable". Board contents are never
-sent anywhere, and there are no analytics. Previews are cached in
-`…/com.local.whiteboard/link-cache/`, and the thumbnail is embedded in the
-board, so existing cards look the same offline. A link pasted while offline
-becomes a basic card ("Preview unavailable offline") with no retries.
-
 ## Where data lives
 
-| What | Location |
-| --- | --- |
-| Boards and workspaces | `~/Documents/Whiteboard/` (ordinary folders and `.excalidraw` files; changeable in Settings) |
-| App metadata and session (favorites, recents, archive list, tabs, viewports, prefs) | `~/Library/Application Support/com.local.whiteboard/state.json` (+ `.bak`) |
-| Version history | `…/com.local.whiteboard/history/<path-hash>/<epoch-ms>.excalidraw` |
-| Thumbnails | `…/com.local.whiteboard/thumbs/<path-hash>.png` |
-| Trash | `…/com.local.whiteboard/trash/<id>/` (only "Delete Permanently" / "Empty Trash" remove files) |
-| Personal library | `…/com.local.whiteboard/library.excalidrawlib` |
-| Your templates | `…/com.local.whiteboard/templates/*.excalidraw` |
-| Link preview cache | `…/com.local.whiteboard/link-cache/*.json` |
-| Action items, check-ins, dismissed suggestions | `…/com.local.whiteboard/action.json` |
-| Window size and position | managed by `tauri-plugin-window-state` |
+| What                                                                                | Location                                                                                      |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Boards and workspaces                                                               | `~/Documents/Whiteboard/` (ordinary folders and `.excalidraw` files; changeable in Settings)  |
+| App metadata and session (favorites, recents, archive list, tabs, viewports, prefs) | `~/Library/Application Support/com.local.whiteboard/state.json` (+ `.bak`)                    |
+| Version history                                                                     | `…/com.local.whiteboard/history/<path-hash>/<epoch-ms>.excalidraw`                            |
+| Thumbnails                                                                          | `…/com.local.whiteboard/thumbs/<path-hash>.png`                                               |
+| Trash                                                                               | `…/com.local.whiteboard/trash/<id>/` (only "Delete Permanently" / "Empty Trash" remove files) |
+| Personal library                                                                    | `…/com.local.whiteboard/library.excalidrawlib`                                                |
+| Your templates                                                                      | `…/com.local.whiteboard/templates/*.excalidraw`                                               |
+| Link preview cache                                                                  | `…/com.local.whiteboard/link-cache/*.json`                                                    |
+| Action items, check-ins, dismissed suggestions                                      | `…/com.local.whiteboard/action.json`                                                          |
+| Window size and position                                                            | managed by `tauri-plugin-window-state`                                                        |
 
 Archive is metadata only: archived boards stay where they are on disk and are
 hidden from the workspace tree. If you rename or move boards inside Whiteboard,
@@ -213,34 +280,37 @@ with: Whiteboard → Change All….
 
 ## Keyboard shortcuts
 
-| Action | Shortcut |
-| --- | --- |
-| New board | ⌘N or ⌘T |
-| New board from template | ⌥⌘N |
-| New folder | ⇧⌘N |
-| Open file | ⌘O |
-| Save now (+ history snapshot) | ⌘S |
-| Save As | ⇧⌘S |
-| Close board / reopen closed board | ⌘W / ⇧⌘T |
-| Search boards & commands | ⌘K |
-| Switch tabs | ⌘1 … ⌘9, ⌃⇥ / ⌃⇧⇥ |
-| Toggle sidebar | ⌘\ |
-| Focus mode | ⇧⌘F (Esc exits) |
-| Version history | ⌘Y |
-| Quick Look selected board (sidebar/cards) | Space |
-| Settings | ⌘, |
-| Shortcut list | ⌘/ |
-| Export image options (Excalidraw) | ⇧⌘E |
-| Capture screenshot onto the board | ⇧⌘2 (system-wide) |
-| Switch Brainstorm / Action | ⇧⌘A |
-| Send selection to Action | ⌥⌘A |
-| Slash commands on the canvas | `/` then `shot`, `embed <url>`, `window`, `screen`, `paste` |
-| Open a link card | double-click |
+| Action                                    | Shortcut                                                    |
+| ----------------------------------------- | ----------------------------------------------------------- |
+| New board                                 | ⌘N or ⌘T                                                    |
+| New board from template                   | ⌥⌘N                                                         |
+| New folder                                | ⇧⌘N                                                         |
+| Open file                                 | ⌘O                                                          |
+| Save now (+ history snapshot)             | ⌘S                                                          |
+| Save As                                   | ⇧⌘S                                                         |
+| Close board / reopen closed board         | ⌘W / ⇧⌘T                                                    |
+| Search boards & commands                  | ⌘K                                                          |
+| Switch tabs                               | ⌘1 … ⌘9, ⌃⇥ / ⌃⇧⇥                                           |
+| Toggle sidebar                            | ⌘\                                                          |
+| Focus mode                                | ⇧⌘F (Esc exits)                                             |
+| Version history                           | ⌘Y                                                          |
+| Quick Look selected board (sidebar/cards) | Space                                                       |
+| Settings                                  | ⌘,                                                          |
+| Shortcut list                             | ⌘/                                                          |
+| Export image options (Excalidraw)         | ⇧⌘E                                                         |
+| Capture screenshot onto the board         | ⇧⌘2 (system-wide)                                           |
+| Switch Brainstorm / Action                | ⇧⌘A                                                         |
+| Send selection to Action                  | ⌥⌘A                                                         |
+| Slash commands on the canvas              | `/` then `shot`, `embed <url>`, `window`, `screen`, `paste` |
+| Open a link card                          | double-click                                                |
 
 All other Excalidraw shortcuts work as usual. Press `?` on the canvas for
 Excalidraw's full list.
 
 ## Licensing
+
+Whiteboard is released under the [MIT License](LICENSE). It is an
+independent project, not affiliated with or endorsed by Excalidraw.
 
 Excalidraw is MIT-licensed (© 2020 Excalidraw). The bundled fonts are under
 the SIL Open Font License 1.1, except Comic Shanns, which is MIT. Full texts and

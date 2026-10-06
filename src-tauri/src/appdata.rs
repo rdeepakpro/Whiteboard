@@ -143,7 +143,7 @@ fn list_snapshots(dir: &Path) -> Vec<Snapshot> {
                 .collect()
         })
         .unwrap_or_default();
-    out.sort_by(|a, b| b.id.cmp(&a.id));
+    out.sort_by_key(|s| std::cmp::Reverse(s.id));
     out
 }
 
@@ -294,7 +294,7 @@ pub fn trash_list(app: AppHandle) -> Vec<TrashEntry> {
                 .collect()
         })
         .unwrap_or_default();
-    out.sort_by(|a, b| b.deleted_at.cmp(&a.deleted_at));
+    out.sort_by_key(|e| std::cmp::Reverse(e.deleted_at));
     out
 }
 

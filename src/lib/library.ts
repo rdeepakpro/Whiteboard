@@ -50,7 +50,10 @@ export function onLibraryChange(next: LibraryItems, fromTabId?: string) {
   window.clearTimeout(saveTimer);
   saveTimer = window.setTimeout(() => {
     const file = getApp().paths?.libraryFile;
-    if (file) ipc.writeText(file, serializeLibraryAsJSON(items)).catch((e) => toast(`Couldn't save the library: ${e}`, "error"));
+    if (file)
+      ipc
+        .writeText(file, serializeLibraryAsJSON(items))
+        .catch((e) => toast(`Couldn't save the library: ${e}`, "error"));
   }, 400);
 }
 

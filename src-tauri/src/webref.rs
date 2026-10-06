@@ -5,6 +5,7 @@
 //!   public thumbnail at i.ytimg.com.
 //! - Everything else (including Instagram): one GET of the page itself to read
 //!   its Open Graph / <title> tags, then its preview image and favicon.
+//!
 //! Nothing about the user's boards is ever sent. Results are cached in
 //! <appData>/link-cache so a link is fetched once (until "Refresh Preview").
 
@@ -63,7 +64,9 @@ fn classify_err(e: ureq::Error) -> FetchErr {
     match e {
         ureq::Error::Status(_, _) => FetchErr::Status,
         ureq::Error::Transport(t) => match t.kind() {
-            ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed if !network_up() => FetchErr::Offline,
+            ureq::ErrorKind::Dns | ureq::ErrorKind::ConnectionFailed if !network_up() => {
+                FetchErr::Offline
+            }
             _ => FetchErr::Other,
         },
     }
@@ -73,7 +76,10 @@ fn classify_err(e: ureq::Error) -> FetchErr {
 /// plain DNS lookup (no HTTP request is made).
 fn network_up() -> bool {
     use std::net::ToSocketAddrs;
-    ("apple.com", 443).to_socket_addrs().map(|mut a| a.next().is_some()).unwrap_or(false)
+    ("apple.com", 443)
+        .to_socket_addrs()
+        .map(|mut a| a.next().is_some())
+        .unwrap_or(false)
 }
 
 /// GET with a size cap. Returns (bytes, content-type, final url).
@@ -145,7 +151,9 @@ fn decode_entities(s: &str) -> String {
             "apos" => Some('\''),
             "nbsp" => Some(' '),
             _ if ent.starts_with("#x") || ent.starts_with("#X") => {
-                u32::from_str_radix(&ent[2..], 16).ok().and_then(char::from_u32)
+                u32::from_str_radix(&ent[2..], 16)
+                    .ok()
+                    .and_then(char::from_u32)
             }
             _ if ent.starts_with('#') => ent[1..].parse::<u32>().ok().and_then(char::from_u32),
             _ => None,
@@ -233,7 +241,9 @@ fn tags<'a>(html: &'a str, lower: &'a str, name: &str) -> Vec<&'a str> {
     let mut from = 0;
     while let Some(p) = lower[from..].find(&needle) {
         let start = from + p + needle.len();
-        let Some(end) = lower[start..].find('>') else { break };
+        let Some(end) = lower[start..].find('>') else {
+            break;
+        };
         out.push(&html[start..start + end]);
         from = start + end;
     }
@@ -251,15 +261,23 @@ fn clean(s: &str) -> Option<String> {
 
 fn parse_meta(html: &str) -> PageMeta {
     // Metadata lives in <head>; don't scan megabytes of body.
-    let head_end = html.to_ascii_lowercase().find("</head>").unwrap_or(html.len().min(400_000));
+    let head_end = html
+        .to_ascii_lowercase()
+        .find("</head>")
+        .unwrap_or(html.len().min(400_000));
     let html = &html[..head_end.min(html.len())];
     let lower = html.to_ascii_lowercase();
     let mut m = PageMeta::default();
     for tag in tags(html, &lower, "meta") {
         let attrs = parse_attrs(tag);
         let get = |k: &str| attrs.iter().find(|(a, _)| a == k).map(|(_, v)| v.as_str());
-        let key = get("property").or_else(|| get("name")).unwrap_or("").to_ascii_lowercase();
-        let Some(content) = get("content") else { continue };
+        let key = get("property")
+            .or_else(|| get("name"))
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let Some(content) = get("content") else {
+            continue;
+        };
         let set = |slot: &mut Option<String>| {
             if slot.is_none() {
                 *slot = clean(content);
@@ -269,7 +287,11 @@ fn parse_meta(html: &str) -> PageMeta {
             "og:title" | "twitter:title" => set(&mut m.og_title),
             "og:description" | "twitter:description" | "description" => set(&mut m.description),
             "og:site_name" | "application-name" => set(&mut m.site_name),
-            "og:image" | "og:image:url" | "og:image:secure_url" | "twitter:image" | "twitter:image:src" => set(&mut m.image),
+            "og:image"
+            | "og:image:url"
+            | "og:image:secure_url"
+            | "twitter:image"
+            | "twitter:image:src" => set(&mut m.image),
             "author" | "article:author" => set(&mut m.author),
             _ => {}
         }
@@ -297,20 +319,32 @@ fn parse_meta(html: &str) -> PageMeta {
 // ------------------------------------------------------------- fetchers
 
 fn youtube_id(url: &url::Url) -> Option<String> {
-    let host = url.host_str()?.trim_start_matches("www.").trim_start_matches("m.");
+    let host = url
+        .host_str()?
+        .trim_start_matches("www.")
+        .trim_start_matches("m.");
     let id = match host {
         "youtu.be" => url.path_segments()?.next().map(|s| s.to_string()),
         "youtube.com" | "music.youtube.com" | "youtube-nocookie.com" => {
             let mut segs = url.path_segments()?;
             match segs.next() {
-                Some("watch") => url.query_pairs().find(|(k, _)| k == "v").map(|(_, v)| v.to_string()),
-                Some("shorts") | Some("embed") | Some("live") | Some("v") => segs.next().map(|s| s.to_string()),
+                Some("watch") => url
+                    .query_pairs()
+                    .find(|(k, _)| k == "v")
+                    .map(|(_, v)| v.to_string()),
+                Some("shorts") | Some("embed") | Some("live") | Some("v") => {
+                    segs.next().map(|s| s.to_string())
+                }
                 _ => None,
             }
         }
         _ => None,
     }?;
-    let ok = id.len() >= 6 && id.len() <= 20 && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
+    let ok = id.len() >= 6
+        && id.len() <= 20
+        && id
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
     ok.then_some(id)
 }
 
@@ -344,7 +378,11 @@ fn fetch_youtube(agent: &ureq::Agent, url: &str, id: &str) -> Preview {
         Err(FetchErr::Other) => {}
     }
     // mqdefault is 16:9 without letterboxing and exists for every video.
-    p.image = image_from(agent, &format!("https://i.ytimg.com/vi/{id}/mqdefault.jpg"), MAX_IMAGE);
+    p.image = image_from(
+        agent,
+        &format!("https://i.ytimg.com/vi/{id}/mqdefault.jpg"),
+        MAX_IMAGE,
+    );
     p.status = if p.title.is_some() && p.image.is_some() {
         "ok"
     } else if p.title.is_some() || p.image.is_some() {
@@ -375,7 +413,11 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
     };
     let base = url::Url::parse(&final_url).ok();
     let resolve = |href: &str| -> Option<String> {
-        base.as_ref()?.join(href).ok().map(|u| u.to_string()).filter(|u| u.starts_with("http"))
+        base.as_ref()?
+            .join(href)
+            .ok()
+            .map(|u| u.to_string())
+            .filter(|u| u.starts_with("http"))
     };
     if ctype.starts_with("image/") {
         // A direct image link: the image is the preview.
@@ -388,7 +430,12 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
             p.status = "ok".into();
         } else {
             p.image = image_from(agent, url, MAX_IMAGE);
-            p.status = if p.image.is_some() { "ok" } else { "unavailable" }.into();
+            p.status = if p.image.is_some() {
+                "ok"
+            } else {
+                "unavailable"
+            }
+            .into();
         }
         return p;
     }
@@ -398,7 +445,7 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
     p.description = m.description;
     p.site_name = m.site_name;
     p.author = m.author;
-    if let Some(img) = m.image.as_deref().and_then(|h| resolve(h)) {
+    if let Some(img) = m.image.as_deref().and_then(&resolve) {
         p.image = image_from(agent, &img, MAX_IMAGE);
     }
     // Favicon: prefer PNG/apple-touch icons, fall back to /favicon.ico.
@@ -421,7 +468,9 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
         }
     }
     // Instagram (and some others) serve a generic shell without metadata.
-    let generic = kind == "instagram" && p.image.is_none() && p.title.as_deref().map_or(true, |t| t == "Instagram");
+    let generic = kind == "instagram"
+        && p.image.is_none()
+        && p.title.as_deref().is_none_or(|t| t == "Instagram");
     if generic {
         p.title = None;
         p.description = None;
@@ -438,7 +487,9 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
 }
 
 fn cache_path(app: &AppHandle, url: &str) -> std::path::PathBuf {
-    data_dir(app).join("link-cache").join(format!("{}.json", path_key(url)))
+    data_dir(app)
+        .join("link-cache")
+        .join(format!("{}.json", path_key(url)))
 }
 
 /// Returns a preview for `url`, from cache unless `refresh` is set. Never
@@ -458,9 +509,18 @@ pub async fn link_preview(app: AppHandle, url: String, refresh: bool) -> Preview
         let agent = agent();
         let parsed = url::Url::parse(&u);
         let Ok(parsed) = parsed else {
-            return Preview { url: u, kind: "web".into(), status: "unavailable".into(), ..Default::default() };
+            return Preview {
+                url: u,
+                kind: "web".into(),
+                status: "unavailable".into(),
+                ..Default::default()
+            };
         };
-        let host = parsed.host_str().unwrap_or("").trim_start_matches("www.").to_string();
+        let host = parsed
+            .host_str()
+            .unwrap_or("")
+            .trim_start_matches("www.")
+            .to_string();
         if let Some(id) = youtube_id(&parsed) {
             fetch_youtube(&agent, &u, &id)
         } else if host == "instagram.com" || host.ends_with(".instagram.com") {
@@ -493,10 +553,22 @@ mod tests {
     #[test]
     fn youtube_ids() {
         let id = |s: &str| youtube_id(&url::Url::parse(s).unwrap());
-        assert_eq!(id("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10").as_deref(), Some("dQw4w9WgXcQ"));
-        assert_eq!(id("https://youtu.be/dQw4w9WgXcQ?si=abc").as_deref(), Some("dQw4w9WgXcQ"));
-        assert_eq!(id("https://youtube.com/shorts/abcDEF12345").as_deref(), Some("abcDEF12345"));
-        assert_eq!(id("https://m.youtube.com/watch?v=dQw4w9WgXcQ").as_deref(), Some("dQw4w9WgXcQ"));
+        assert_eq!(
+            id("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10").as_deref(),
+            Some("dQw4w9WgXcQ")
+        );
+        assert_eq!(
+            id("https://youtu.be/dQw4w9WgXcQ?si=abc").as_deref(),
+            Some("dQw4w9WgXcQ")
+        );
+        assert_eq!(
+            id("https://youtube.com/shorts/abcDEF12345").as_deref(),
+            Some("abcDEF12345")
+        );
+        assert_eq!(
+            id("https://m.youtube.com/watch?v=dQw4w9WgXcQ").as_deref(),
+            Some("dQw4w9WgXcQ")
+        );
         assert_eq!(id("https://www.youtube.com/@channel"), None);
         assert_eq!(id("https://example.com/watch?v=dQw4w9WgXcQ"), None);
     }
@@ -526,8 +598,9 @@ mod network_tests {
     #[ignore]
     fn live_previews() {
         let a = agent();
-        let show = |p: &Preview| {
-            println!(
+        let show =
+            |p: &Preview| {
+                println!(
                 "{:<9} {:<11} title={:?} author={:?} site={:?} desc={:?} image={:?} favicon={:?}",
                 p.kind,
                 p.status,
@@ -538,14 +611,34 @@ mod network_tests {
                 p.image.as_ref().map(|i| (i.mime.clone(), i.data.len())),
                 p.favicon.as_ref().map(|i| (i.mime.clone(), i.data.len())),
             )
-        };
-        show(&fetch_youtube(&a, "https://youtu.be/dQw4w9WgXcQ", "dQw4w9WgXcQ"));
-        show(&fetch_youtube(&a, "https://www.youtube.com/watch?v=AAAAAAAAAAA", "AAAAAAAAAAA"));
-        show(&fetch_page(&a, "https://www.instagram.com/p/CwHNC2gu8ZP/", "instagram"));
+            };
+        show(&fetch_youtube(
+            &a,
+            "https://youtu.be/dQw4w9WgXcQ",
+            "dQw4w9WgXcQ",
+        ));
+        show(&fetch_youtube(
+            &a,
+            "https://www.youtube.com/watch?v=AAAAAAAAAAA",
+            "AAAAAAAAAAA",
+        ));
+        show(&fetch_page(
+            &a,
+            "https://www.instagram.com/p/CwHNC2gu8ZP/",
+            "instagram",
+        ));
         show(&fetch_page(&a, "https://www.producthunt.com/", "web"));
-        show(&fetch_page(&a, "https://github.com/excalidraw/excalidraw", "web"));
+        show(&fetch_page(
+            &a,
+            "https://github.com/excalidraw/excalidraw",
+            "web",
+        ));
         show(&fetch_page(&a, "https://example.com/", "web"));
-        show(&fetch_page(&a, "https://this-domain-does-not-exist-wb.invalid/", "web"));
+        show(&fetch_page(
+            &a,
+            "https://this-domain-does-not-exist-wb.invalid/",
+            "web",
+        ));
     }
 }
 
@@ -569,7 +662,9 @@ pub async fn local_ai(model: String, prompt: String) -> Option<String> {
             .send_string(&body.to_string())
             .ok()?;
         let v: serde_json::Value = serde_json::from_str(&resp.into_string().ok()?).ok()?;
-        v.get("response").and_then(|r| r.as_str()).map(|s| s.trim().to_string())
+        v.get("response")
+            .and_then(|r| r.as_str())
+            .map(|s| s.trim().to_string())
     })
     .await
     .ok()
@@ -580,8 +675,15 @@ pub async fn local_ai(model: String, prompt: String) -> Option<String> {
 #[tauri::command]
 pub async fn local_ai_models() -> Option<Vec<String>> {
     tauri::async_runtime::spawn_blocking(|| {
-        let agent = ureq::AgentBuilder::new().timeout(Duration::from_secs(2)).build();
-        let raw = agent.get("http://127.0.0.1:11434/api/tags").call().ok()?.into_string().ok()?;
+        let agent = ureq::AgentBuilder::new()
+            .timeout(Duration::from_secs(2))
+            .build();
+        let raw = agent
+            .get("http://127.0.0.1:11434/api/tags")
+            .call()
+            .ok()?
+            .into_string()
+            .ok()?;
         let v: serde_json::Value = serde_json::from_str(&raw).ok()?;
         Some(
             v.get("models")?

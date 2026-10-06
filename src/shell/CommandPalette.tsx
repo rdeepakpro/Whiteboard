@@ -57,7 +57,9 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
       return;
     }
     const id = window.setTimeout(() => {
-      const extra = getApp().recents.map((r) => r.path).filter((p) => !p.startsWith(root));
+      const extra = getApp()
+        .recents.map((r) => r.path)
+        .filter((p) => !p.startsWith(root));
       ipc.searchText(root, extra, q).then(setTextHits, () => setTextHits([]));
     }, 120);
     return () => window.clearTimeout(id);
@@ -73,7 +75,12 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
       const word = q.split(/\s+/)[0];
       const slashCmds: Result[] = commands
         .filter((c) => c.slash?.some((s) => s.startsWith(word)))
-        .map((c) => ({ kind: "command", id: c.id, title: `${c.slash!.find((s) => s.startsWith(word))}  ·  ${c.title}`, shortcut: c.shortcut }));
+        .map((c) => ({
+          kind: "command",
+          id: c.id,
+          title: `${c.slash!.find((s) => s.startsWith(word))}  ·  ${c.title}`,
+          shortcut: c.shortcut,
+        }));
       return directUrl ? [{ kind: "insert-url", url: directUrl }, ...slashCmds] : slashCmds;
     }
     const archivedSet = new Set(archived);
@@ -84,7 +91,11 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
     } else {
       const candidates = new Set([...allBoards(tree).map((b) => b.path), ...recents.map((r) => r.path)]);
       for (const p of candidates) {
-        const s = Math.max(score(boardName(p), q), score(prettyLocation(p, root), q) * 0.6, score(`${prettyLocation(p, root)} ${boardName(p)}`, q) * 0.5);
+        const s = Math.max(
+          score(boardName(p), q),
+          score(prettyLocation(p, root), q) * 0.6,
+          score(`${prettyLocation(p, root)} ${boardName(p)}`, q) * 0.5,
+        );
         if (s > 0) boardPaths.set(p, s - (archivedSet.has(p) ? 30 : 0) - (recentRank.get(p) ?? 40) * 0.05);
       }
     }
@@ -93,7 +104,10 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
       .slice(0, 8)
       .map(([path]) => ({ kind: "board", path, sub: prettyLocation(path, root), archived: archivedSet.has(path) }));
     const shown = new Set(boardPaths.keys());
-    const text: Result[] = textHits.filter((h) => !shown.has(h.path)).slice(0, 6).map((h) => ({ kind: "text", ...h }));
+    const text: Result[] = textHits
+      .filter((h) => !shown.has(h.path))
+      .slice(0, 6)
+      .map((h) => ({ kind: "text", ...h }));
     const cmds: Result[] = commands
       .filter((c) => c.palette && (!c.needsBoard || hasBoard))
       .map((c) => ({ c, s: q ? Math.max(score(c.title, q), score(c.keywords ?? "", q) * 0.7) : 1 }))
@@ -147,7 +161,15 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
   let lastKind = "";
   const heading = (r: Result) => {
     const label =
-      r.kind === "insert-url" ? "Insert" : r.kind === "board" ? (query.trim() ? "Boards" : "Recent") : r.kind === "text" ? "Found in board text" : "Commands";
+      r.kind === "insert-url"
+        ? "Insert"
+        : r.kind === "board"
+          ? query.trim()
+            ? "Boards"
+            : "Recent"
+          : r.kind === "text"
+            ? "Found in board text"
+            : "Commands";
     if (label === lastKind) return null;
     lastKind = label;
     return <div className="palette__heading">{label}</div>;
@@ -178,7 +200,13 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
                 onClick={() => run(r)}
               >
                 <span className="palette__icon">
-                  {r.kind === "command" ? Icon.chevron : r.kind === "text" ? Icon.search : r.kind === "insert-url" ? Icon.link : Icon.board}
+                  {r.kind === "command"
+                    ? Icon.chevron
+                    : r.kind === "text"
+                      ? Icon.search
+                      : r.kind === "insert-url"
+                        ? Icon.link
+                        : Icon.board}
                 </span>
                 {r.kind === "insert-url" && (
                   <>
@@ -189,7 +217,10 @@ export function CommandPalette({ initialQuery = "" }: { initialQuery?: string })
                 {r.kind === "board" && (
                   <>
                     <span className="palette__title">{boardName(r.path)}</span>
-                    <span className="palette__sub">{r.archived ? "Archived · " : ""}{r.sub}</span>
+                    <span className="palette__sub">
+                      {r.archived ? "Archived · " : ""}
+                      {r.sub}
+                    </span>
                   </>
                 )}
                 {r.kind === "text" && (

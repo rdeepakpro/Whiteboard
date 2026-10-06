@@ -6,14 +6,7 @@
 import { ask, open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { ipc, errorCode, friendlyError } from "../platform/ipc";
-import {
-  allBoards,
-  findNode,
-  getApp,
-  newTabId,
-  setApp,
-  type Tab,
-} from "../state/store";
+import { allBoards, findNode, getApp, newTabId, setApp, type Tab } from "../state/store";
 import { schedulePersist, viewports } from "../state/persist";
 import { sessions, sessionForPath, activeSession, focusEditor } from "../editor/registry";
 import { emptySceneJSON, serializeScene } from "../editor/scene";
@@ -200,15 +193,23 @@ export async function newBoard(opts: { folder?: string; content?: string; name?:
 }
 
 export async function newFolder(parent?: string) {
-  const dir = parent ?? (() => {
-    const s = getApp();
-    const sel = s.selected ? findNode(s.tree, s.selected) : null;
-    return sel?.kind === "folder" ? sel.path : root();
-  })();
+  const dir =
+    parent ??
+    (() => {
+      const s = getApp();
+      const sel = s.selected ? findNode(s.tree, s.selected) : null;
+      return sel?.kind === "folder" ? sel.path : root();
+    })();
   try {
     const path = await ipc.uniquePath(dir, "New Folder", null);
     await ipc.createFolder(path);
-    setApp((s) => ({ expanded: { ...s.expanded, [dir]: true, [path]: true }, selected: path, renaming: path, sidebarCollapsed: false, focusMode: false }));
+    setApp((s) => ({
+      expanded: { ...s.expanded, [dir]: true, [path]: true },
+      selected: path,
+      renaming: path,
+      sidebarCollapsed: false,
+      focusMode: false,
+    }));
     await refreshTree();
   } catch (e) {
     toast(friendlyError(e, "create the folder"), "error");
@@ -291,7 +292,11 @@ export async function renamePath(path: string, newName: string) {
 
 export async function moveInto(path: string, folder: string) {
   if (dirname(path) === folder || isInside(folder, path)) return;
-  const to = await ipc.uniquePath(folder, path.endsWith(`.${EXT}`) ? boardName(path) : basename(path), path.endsWith(`.${EXT}`) ? EXT : null);
+  const to = await ipc.uniquePath(
+    folder,
+    path.endsWith(`.${EXT}`) ? boardName(path) : basename(path),
+    path.endsWith(`.${EXT}`) ? EXT : null,
+  );
   if (await relocate(path, to, "move it")) {
     setApp((s) => ({ expanded: { ...s.expanded, [folder]: true } }));
   }
@@ -375,9 +380,7 @@ export async function trashPath(path: string) {
 export async function openWithDialog() {
   const picked = await openDialog({
     multiple: true,
-    filters: [
-      { name: "Excalidraw", extensions: ["excalidraw", "excalidrawlib", "json"] },
-    ],
+    filters: [{ name: "Excalidraw", extensions: ["excalidraw", "excalidrawlib", "json"] }],
   });
   if (!picked) return;
   for (const p of Array.isArray(picked) ? picked : [picked]) await openBoard(p);

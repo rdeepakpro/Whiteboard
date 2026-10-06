@@ -64,9 +64,15 @@ function ConflictBar() {
           the other version is kept in Version History.
         </span>
         <div className="banner__actions">
-          <button className="btn" onClick={() => session?.reloadFromDisk()}>Reload from Disk</button>
-          <button className="btn" onClick={() => session?.keepMine()}>Keep Whiteboard Version</button>
-          <button className="btn" onClick={() => saveAs()}>Save As…</button>
+          <button className="btn" onClick={() => session?.reloadFromDisk()}>
+            Reload from Disk
+          </button>
+          <button className="btn" onClick={() => session?.keepMine()}>
+            Keep Whiteboard Version
+          </button>
+          <button className="btn" onClick={() => saveAs()}>
+            Save As…
+          </button>
         </div>
       </div>
     );
@@ -78,9 +84,15 @@ function ConflictBar() {
           <strong>“{name}”</strong> was moved or deleted outside Whiteboard. Your drawing is still open here.
         </span>
         <div className="banner__actions">
-          <button className="btn" onClick={() => session?.save({ force: true })}>Save Here Again</button>
-          <button className="btn" onClick={() => saveAs()}>Save As…</button>
-          <button className="btn" onClick={() => closeTab(tab.id)}>Close</button>
+          <button className="btn" onClick={() => session?.save({ force: true })}>
+            Save Here Again
+          </button>
+          <button className="btn" onClick={() => saveAs()}>
+            Save As…
+          </button>
+          <button className="btn" onClick={() => closeTab(tab.id)}>
+            Close
+          </button>
         </div>
       </div>
     );

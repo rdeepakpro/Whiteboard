@@ -20,7 +20,11 @@ export function StatusBar() {
   else if (status.missing) save = <span className="status-err">File missing</span>;
   else if (status.error)
     save = (
-      <button className="status-err linkish" title={status.error} onClick={() => void activeSession()?.save({ manual: true })}>
+      <button
+        className="status-err linkish"
+        title={status.error}
+        onClick={() => void activeSession()?.save({ manual: true })}
+      >
         Save failed — retry
       </button>
     );
@@ -34,13 +38,19 @@ export function StatusBar() {
 
   return (
     <footer className="statusbar">
-      <button className="statusbar__path linkish" title={`Show “${tab.path}” in Finder`} onClick={() => reveal(tab.path)}>
+      <button
+        className="statusbar__path linkish"
+        title={`Show “${tab.path}” in Finder`}
+        onClick={() => reveal(tab.path)}
+      >
         {location} / <strong>{boardName(tab.path)}</strong>
       </button>
       <div className="statusbar__right">
         {!status.loadError && (
           <>
-            <span>{stats.elements} element{stats.elements === 1 ? "" : "s"}</span>
+            <span>
+              {stats.elements} element{stats.elements === 1 ? "" : "s"}
+            </span>
             <span className="sep">·</span>
             <span>{Math.round(stats.zoom * 100)}%</span>
             <span className="sep">·</span>

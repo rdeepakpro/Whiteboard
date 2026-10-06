@@ -101,7 +101,8 @@ export async function computeSuggestions(): Promise<Suggestion[]> {
     }
     for (const text of d.todos) {
       const id = `todo:${d.path}:${text}`;
-      if (!skip.has(id) && !existing.has(text.toLowerCase())) out.push({ id, type: "todo", path: d.path, text });
+      const clean = text.charAt(0).toUpperCase() + text.slice(1);
+      if (!skip.has(id) && !existing.has(text.toLowerCase())) out.push({ id, type: "todo", path: d.path, text: clean });
     }
   }
   return out.slice(0, 12);
@@ -166,7 +167,11 @@ async function aiName(d: BoardDigest): Promise<string | null> {
   if (aiNames.has(key)) return aiNames.get(key)!;
   const prompt = `Suggest a short, specific title (2-4 words, Title Case) for a brainstorming whiteboard with this content. Reply with the title only.\n\nHeadings: ${d.headings.join(" | ")}\nText: ${d.text.slice(0, 1500)}`;
   const raw = await ipc.localAi(localAiModel, prompt).catch(() => null);
-  const name = raw?.split("\n")[0].replace(/^["'*\s]+|["'*.\s]+$/g, "").slice(0, 50) || null;
+  const name =
+    raw
+      ?.split("\n")[0]
+      .replace(/^["'*\s]+|["'*.\s]+$/g, "")
+      .slice(0, 50) || null;
   aiNames.set(key, name);
   return name;
 }

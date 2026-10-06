@@ -47,7 +47,11 @@ export function rebase(p: string, from: string, to: string): string {
 
 /** Characters macOS Finder disallows or that break paths. */
 export function sanitizeName(name: string): string {
-  return name.replace(/[/:\\]/g, "-").replace(/^\.+/, "").trim().slice(0, 200);
+  return name
+    .replace(/[/:\\]/g, "-")
+    .replace(/^\.+/, "")
+    .trim()
+    .slice(0, 200);
 }
 
 export function prettyLocation(path: string, root: string): string {

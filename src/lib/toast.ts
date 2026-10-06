@@ -13,7 +13,9 @@ let nextId = 1;
 
 export function toast(message: string, kind: Toast["kind"] = "info", action?: Toast["action"]) {
   const id = nextId++;
-  useToasts.setState((s) => ({ toasts: [...s.toasts.filter((t) => t.message !== message), { id, message, kind, action }].slice(-3) }));
+  useToasts.setState((s) => ({
+    toasts: [...s.toasts.filter((t) => t.message !== message), { id, message, kind, action }].slice(-3),
+  }));
   window.setTimeout(() => dismissToast(id), kind === "error" ? 7000 : action ? 6000 : 3000);
 }
 

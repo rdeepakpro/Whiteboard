@@ -22,8 +22,9 @@ import { closeTab, openWithDialog, saveAs, reveal } from "../lib/boards";
 import { Icon } from "../shell/icons";
 
 const UI_OPTIONS: Partial<UIOptions> = {
-  // Let sidebars (Library, Design) dock beside the canvas on laptop screens.
-  dockedSidebarBreakpoint: 1000,
+  // Let sidebars (Library, Design) dock beside the canvas when there's room;
+  // on narrower windows they float over the canvas instead.
+  dockedSidebarBreakpoint: 1180,
   canvasActions: {
     loadScene: false, // replaced by native Open… (Cmd+O)
     saveToActiveFile: false, // Whiteboard autosaves to the board's file
@@ -116,7 +117,6 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempt]);
 
   // When this tab becomes active: re-measure and give the canvas focus.
@@ -175,9 +175,15 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
           <div className="editor-error__body">{load.message}</div>
           <div className="editor-error__body muted">Whiteboard hasn't changed the file.</div>
           <div className="row gap">
-            <button className="btn" onClick={() => setAttempt((n) => n + 1)}>Try Again</button>
-            <button className="btn" onClick={() => reveal(path)}>Show in Finder</button>
-            <button className="btn" onClick={() => closeTab(tabId)}>Close</button>
+            <button className="btn" onClick={() => setAttempt((n) => n + 1)}>
+              Try Again
+            </button>
+            <button className="btn" onClick={() => reveal(path)}>
+              Show in Finder
+            </button>
+            <button className="btn" onClick={() => closeTab(tabId)}>
+              Close
+            </button>
           </div>
         </div>
       </div>

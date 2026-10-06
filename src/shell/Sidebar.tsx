@@ -69,7 +69,10 @@ function NavLinks() {
   const noTabs = useApp((s) => s.tabs.length === 0);
   return (
     <div className="nav">
-      <button className={`nav-row${page === "home" || (noTabs && !page) ? " active" : ""}`} onClick={() => setApp({ page: "home" })}>
+      <button
+        className={`nav-row${page === "home" || (noTabs && !page) ? " active" : ""}`}
+        onClick={() => setApp({ page: "home" })}
+      >
         <span className="nav-row__icon">{Icon.home}</span>
         Home
       </button>
@@ -139,7 +142,12 @@ function ShortcutRow({ path, icon, iconClass }: { path: string; icon: React.Reac
 
 // ----------------------------------------------------------------- tree
 
-function visibleRows(nodes: TreeNode[], expanded: Record<string, boolean>, archived: Set<string>, out: TreeNode[] = []) {
+function visibleRows(
+  nodes: TreeNode[],
+  expanded: Record<string, boolean>,
+  archived: Set<string>,
+  out: TreeNode[] = [],
+) {
   for (const n of nodes) {
     if (n.kind === "board" && archived.has(n.path)) continue;
     out.push(n);
@@ -164,7 +172,9 @@ function WorkspaceTree() {
     const select = (n?: TreeNode) => {
       if (!n) return;
       setApp({ selected: n.path });
-      ref.current?.querySelector<HTMLElement>(`[data-path="${CSS.escape(n.path)}"]`)?.scrollIntoView({ block: "nearest" });
+      ref.current
+        ?.querySelector<HTMLElement>(`[data-path="${CSS.escape(n.path)}"]`)
+        ?.scrollIntoView({ block: "nearest" });
     };
     switch (e.key) {
       case "ArrowDown":
@@ -178,7 +188,8 @@ function WorkspaceTree() {
         break;
       case "ArrowLeft":
         if (cur?.kind === "folder" && s.expanded[cur.path]) setExpanded(cur.path, false);
-        else if (cur && dirname(cur.path) !== s.prefs.libraryRoot) select(findNode(s.tree, dirname(cur.path)) ?? undefined);
+        else if (cur && dirname(cur.path) !== s.prefs.libraryRoot)
+          select(findNode(s.tree, dirname(cur.path)) ?? undefined);
         break;
       case "Enter":
         if (cur?.kind === "board") void openBoard(cur.path);
@@ -279,7 +290,10 @@ const TreeRow = memo(function TreeRow({ node, depth }: { node: TreeNode; depth: 
             e.stopPropagation();
             setApp({ selected: node.path });
             const r = e.currentTarget.getBoundingClientRect();
-            openContextMenu({ clientX: r.left, clientY: r.bottom + 2 }, isFolder ? folderMenu(node.path) : boardMenu(node.path, { inTree: true }));
+            openContextMenu(
+              { clientX: r.left, clientY: r.bottom + 2 },
+              isFolder ? folderMenu(node.path) : boardMenu(node.path, { inTree: true }),
+            );
           }}
         >
           {Icon.more}
@@ -354,7 +368,13 @@ function ResizeHandle() {
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
   };
-  return <div className="sidebar__resize" onPointerDown={onPointerDown} onDoubleClick={() => setApp({ sidebarWidth: 248 })} />;
+  return (
+    <div
+      className="sidebar__resize"
+      onPointerDown={onPointerDown}
+      onDoubleClick={() => setApp({ sidebarWidth: 248 })}
+    />
+  );
 }
 
 function DragGhost() {

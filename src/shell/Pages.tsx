@@ -2,7 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { allBoards, setApp, useApp } from "../state/store";
 import { ipc, friendlyError, type TrashEntry } from "../platform/ipc";
-import { moveInto, newBoard, openBoard, openWithDialog, refreshTree, renamePath, setArchived, trashPath } from "../lib/boards";
+import {
+  moveInto,
+  newBoard,
+  openBoard,
+  openWithDialog,
+  refreshTree,
+  renamePath,
+  setArchived,
+  trashPath,
+} from "../lib/boards";
 import { computeSuggestions, type Suggestion } from "../action/suggest";
 import { dismissSuggestion, useAction } from "../action/store";
 import { ensureThumbnails } from "../lib/thumbnails";
@@ -73,11 +82,16 @@ function BoardCard({ path, time, actions }: { path: string; time?: number; actio
   );
 }
 
-function BoardGrid({ items, empty }: { items: { path: string; time?: number; actions?: React.ReactNode }[]; empty: string }) {
+function BoardGrid({
+  items,
+  empty,
+}: {
+  items: { path: string; time?: number; actions?: React.ReactNode }[];
+  empty: string;
+}) {
   const key = items.map((i) => i.path).join("|");
   useEffect(() => {
     void ensureThumbnails(items.map((i) => i.path));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   if (!items.length) return <div className="page__empty">{empty}</div>;
   return (
@@ -124,14 +138,17 @@ function HomePage() {
         <>
           <div className="page__section-title">
             Recent
-            <button className="linkish" onClick={() => setApp({ page: "recents" })}>Show all</button>
+            <button className="linkish" onClick={() => setApp({ page: "recents" })}>
+              Show all
+            </button>
           </div>
           <BoardGrid items={items} empty="" />
         </>
       )}
       <TidyUp />
       <div className="home__hint">
-        <kbd>⌘N</kbd> new board <span className="sep">·</span> <kbd>⌘K</kbd> search <span className="sep">·</span> <kbd>⇧⌘F</kbd> focus mode
+        <kbd>⌘N</kbd> new board <span className="sep">·</span> <kbd>⌥⌘D</kbd> new design <span className="sep">·</span>{" "}
+        <kbd>⌘K</kbd> search <span className="sep">·</span> <kbd>⇧⌘A</kbd> Action
       </div>
     </div>
   );
@@ -168,7 +185,9 @@ function TidyUp() {
             ) : null}
           </div>
           <div className="suggestion__actions">
-            <button className="btn small" onClick={() => openBoard(s.path)}>Look</button>
+            <button className="btn small" onClick={() => openBoard(s.path)}>
+              Look
+            </button>
             <button
               className="btn small primary"
               onClick={async () => {
@@ -226,8 +245,12 @@ function ArchivePage() {
           time: mtimes.get(p),
           actions: (
             <>
-              <button className="btn small" onClick={() => setArchived(p, false)}>Unarchive</button>
-              <button className="btn small" onClick={() => trashPath(p)}>Move to Trash</button>
+              <button className="btn small" onClick={() => setArchived(p, false)}>
+                Unarchive
+              </button>
+              <button className="btn small" onClick={() => trashPath(p)}>
+                Move to Trash
+              </button>
             </>
           ),
         }))}
@@ -249,7 +272,11 @@ function TrashPage() {
     try {
       const to = await ipc.trashRestore(e.id);
       await refreshTree();
-      toast(`Restored “${e.name}”`, "info", e.kind === "board" ? { label: "Open", run: () => openBoard(to) } : undefined);
+      toast(
+        `Restored “${e.name}”`,
+        "info",
+        e.kind === "board" ? { label: "Open", run: () => openBoard(to) } : undefined,
+      );
     } catch (err) {
       toast(friendlyError(err, "restore it"), "error");
     }
@@ -284,7 +311,11 @@ function TrashPage() {
     <div className="page__inner">
       <div className="page__title-row">
         <h2 className="page__title">Trash</h2>
-        {!!entries?.length && <button className="btn" onClick={empty}>Empty Trash…</button>}
+        {!!entries?.length && (
+          <button className="btn" onClick={empty}>
+            Empty Trash…
+          </button>
+        )}
       </div>
       <p className="page__lead">Deleted boards and folders stay here until you delete them permanently.</p>
       {entries?.length === 0 && <div className="page__empty">Trash is empty.</div>}
@@ -298,8 +329,12 @@ function TrashPage() {
                 From {prettyLocation(e.originalPath, root)} · deleted {relativeTime(e.deletedAt)}
               </div>
             </div>
-            <button className="btn small" onClick={() => restore(e)}>Restore</button>
-            <button className="btn small danger" onClick={() => remove(e)}>Delete Permanently…</button>
+            <button className="btn small" onClick={() => restore(e)}>
+              Restore
+            </button>
+            <button className="btn small danger" onClick={() => remove(e)}>
+              Delete Permanently…
+            </button>
           </div>
         ))}
       </div>

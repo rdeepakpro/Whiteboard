@@ -107,11 +107,7 @@ export class BoardSession {
   /** Current scene as `.excalidraw` JSON. */
   serialize(): string | null {
     if (!this.api) return null;
-    return serializeScene(
-      this.api.getSceneElementsIncludingDeleted(),
-      this.api.getAppState(),
-      this.api.getFiles(),
-    );
+    return serializeScene(this.api.getSceneElementsIncludingDeleted(), this.api.getAppState(), this.api.getFiles());
   }
 
   /**

@@ -21,7 +21,14 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { ipc, type LinkPreview } from "../platform/ipc";
 import type { BoardSession } from "../editor/BoardSession";
-import { base64ToBlob, fileData, insertionPoint, prepareImage, type PreparedImage, type ScenePoint } from "./canvasInsert";
+import {
+  base64ToBlob,
+  fileData,
+  insertionPoint,
+  prepareImage,
+  type PreparedImage,
+  type ScenePoint,
+} from "./canvasInsert";
 import { toast } from "./toast";
 
 export type RefKind = "youtube" | "instagram" | "web";
@@ -39,7 +46,11 @@ export interface WbRef {
 export function parseLink(text: string | null | undefined): string | null {
   const t = (text ?? "").trim();
   if (!t || /\s/.test(t) || t.length > 2048) return null;
-  const candidate = /^https?:\/\//i.test(t) ? t : /^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/\S*)?$/i.test(t) ? `https://${t}` : null;
+  const candidate = /^https?:\/\//i.test(t)
+    ? t
+    : /^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/\S*)?$/i.test(t)
+      ? `https://${t}`
+      : null;
   if (!candidate) return null;
   try {
     const u = new URL(candidate);
@@ -173,7 +184,17 @@ function buildCard(spec: CardSpec, origin: ScenePoint): ExcalidrawElement[] {
       { regenerateIds: true },
     );
     const [label] = convertToExcalidrawElements(
-      [{ type: "text", x: 0, y: 0, text: spec.band.label, fontSize: 18, fontFamily: FONT_FAMILY.Nunito, strokeColor: spec.band.color } as any],
+      [
+        {
+          type: "text",
+          x: 0,
+          y: 0,
+          text: spec.band.label,
+          fontSize: 18,
+          fontFamily: FONT_FAMILY.Nunito,
+          strokeColor: spec.band.color,
+        } as any,
+      ],
       { regenerateIds: true },
     );
     parts.push(
@@ -197,7 +218,16 @@ function buildCard(spec: CardSpec, origin: ScenePoint): ExcalidrawElement[] {
       ih = maxH;
     }
     const [img] = convertToExcalidrawElements(
-      [{ type: "image", fileId: spec.image.fileId, x: origin.x + PAD + (INNER - iw) / 2, y, width: iw, height: ih } as any],
+      [
+        {
+          type: "image",
+          fileId: spec.image.fileId,
+          x: origin.x + PAD + (INNER - iw) / 2,
+          y,
+          width: iw,
+          height: ih,
+        } as any,
+      ],
       { regenerateIds: true },
     );
     parts.push({ ...img, customData: ref("thumb") } as ExcalidrawElement);
@@ -206,7 +236,17 @@ function buildCard(spec: CardSpec, origin: ScenePoint): ExcalidrawElement[] {
 
   const addText = (text: string, size: number, color: string, role: WbRef["role"], dx = 0) => {
     const [t] = convertToExcalidrawElements(
-      [{ type: "text", x: origin.x + PAD + dx, y, text, fontSize: size, fontFamily: FONT_FAMILY.Nunito, strokeColor: color } as any],
+      [
+        {
+          type: "text",
+          x: origin.x + PAD + dx,
+          y,
+          text,
+          fontSize: size,
+          fontFamily: FONT_FAMILY.Nunito,
+          strokeColor: color,
+        } as any,
+      ],
       { regenerateIds: true },
     );
     parts.push({ ...t, customData: ref(role) } as ExcalidrawElement);
@@ -349,7 +389,11 @@ function addCard(api: ExcalidrawImperativeAPI, elements: ExcalidrawElement[]) {
 async function toImage(img: LinkPreview["image"], opts: { maxSide: number; jpeg?: boolean }) {
   if (!img) return null;
   try {
-    return await prepareImage(base64ToBlob(img.data, img.mime), { maxSide: opts.maxSide, preferJpeg: opts.jpeg, maxBytes: 400_000 });
+    return await prepareImage(base64ToBlob(img.data, img.mime), {
+      maxSide: opts.maxSide,
+      preferJpeg: opts.jpeg,
+      maxBytes: 400_000,
+    });
   } catch {
     return null; // undecodable image: just skip it
   }
@@ -374,7 +418,7 @@ async function specFromPreview(cardId: string, url: string, p: LinkPreview | nul
     return {
       ...base,
       band: { label: "▶  YouTube", color: "#e03131", bg: "#fff5f5" },
-      title: offline ? "YouTube video" : p?.description ?? "YouTube video",
+      title: offline ? "YouTube video" : (p?.description ?? "YouTube video"),
       subtitle: shortUrl(url),
       status: offline ? "Preview unavailable offline" : "Open Link ↗",
     };
@@ -449,7 +493,18 @@ export async function insertWebReference(session: BoardSession, rawUrl: string, 
   const placeholderTimer = window.setTimeout(() => {
     addCard(
       api,
-      buildCard({ cardId, url, kind: c.kind, title: null, subtitle: "Loading preview…", source: c.kind === "web" ? c.host : c.label, sourceColor: c.color }, origin),
+      buildCard(
+        {
+          cardId,
+          url,
+          kind: c.kind,
+          title: null,
+          subtitle: "Loading preview…",
+          source: c.kind === "web" ? c.host : c.label,
+          sourceColor: c.color,
+        },
+        origin,
+      ),
     );
     placed = true;
   }, 120);
@@ -472,7 +527,17 @@ export async function refreshCard(session: BoardSession, ref: WbRef) {
   const api = session.api;
   if (!api) return;
   replaceCard(api, ref.cardId, (o) =>
-    buildCard({ cardId: ref.cardId, url: ref.url, kind: ref.kind, subtitle: "Refreshing preview…", source: classify(ref.url).label, sourceColor: MUTED }, o),
+    buildCard(
+      {
+        cardId: ref.cardId,
+        url: ref.url,
+        kind: ref.kind,
+        subtitle: "Refreshing preview…",
+        source: classify(ref.url).label,
+        sourceColor: MUTED,
+      },
+      o,
+    ),
   );
   let preview: LinkPreview | null = null;
   try {
@@ -515,7 +580,17 @@ export function convertToPlainLink(session: BoardSession, ref: WbRef) {
   if (!api) return;
   replaceCard(api, ref.cardId, (o) => {
     const [t] = convertToExcalidrawElements(
-      [{ type: "text", x: o.x, y: o.y, text: ref.url, fontSize: 16, fontFamily: FONT_FAMILY.Nunito, strokeColor: "#1971c2" } as any],
+      [
+        {
+          type: "text",
+          x: o.x,
+          y: o.y,
+          text: ref.url,
+          fontSize: 16,
+          fontFamily: FONT_FAMILY.Nunito,
+          strokeColor: "#1971c2",
+        } as any,
+      ],
       { regenerateIds: true },
     );
     return [{ ...t, link: ref.url, groupIds: [`${ref.cardId}-g`] } as ExcalidrawElement];
@@ -541,7 +616,9 @@ export function deleteCard(session: BoardSession, ref: WbRef) {
   if (!api) return;
   const ids = new Set(cardElements(api, ref.cardId).map((e) => e.id));
   api.updateScene({
-    elements: api.getSceneElementsIncludingDeleted().map((e) => (ids.has(e.id) ? newElementWith(e as any, { isDeleted: true }) : e)),
+    elements: api
+      .getSceneElementsIncludingDeleted()
+      .map((e) => (ids.has(e.id) ? newElementWith(e as any, { isDeleted: true }) : e)),
     appState: { selectedElementIds: {}, selectedGroupIds: {} } as any,
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   });

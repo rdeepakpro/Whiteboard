@@ -1,0 +1,38 @@
+name: Release
+
+# Push a tag like v1.0.0 to build Whiteboard.app / Whiteboard.dmg for Apple
+# Silicon and attach them to a draft GitHub release. Builds are unsigned.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Whiteboard ${{ github.ref_name }}
+          releaseBody: Unsigned build for Apple Silicon Macs. First launch — right-click Whiteboard.app → Open.
+          releaseDraft: true

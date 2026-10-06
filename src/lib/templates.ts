@@ -30,7 +30,16 @@ const C = {
 
 type Skel = Record<string, any>;
 
-const box = (id: string, x: number, y: number, w: number, h: number, text: string, bg = "transparent", extra: Skel = {}): Skel => ({
+const box = (
+  id: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  text: string,
+  bg = "transparent",
+  extra: Skel = {},
+): Skel => ({
   type: "rectangle",
   id,
   x,
@@ -40,19 +49,42 @@ const box = (id: string, x: number, y: number, w: number, h: number, text: strin
   backgroundColor: bg,
   fillStyle: "solid",
   roundness: { type: 3 },
-  label: { text, fontSize: 20 },
+  label: { text, fontSize: 20, strokeColor: "#1e1e1e" },
   ...extra,
 });
 
 const ellipse = (id: string, x: number, y: number, w: number, h: number, text: string, bg = "transparent"): Skel => ({
-  type: "ellipse", id, x, y, width: w, height: h, backgroundColor: bg, fillStyle: "solid", label: { text, fontSize: 24 },
+  type: "ellipse",
+  id,
+  x,
+  y,
+  width: w,
+  height: h,
+  backgroundColor: bg,
+  fillStyle: "solid",
+  label: { text, fontSize: 24 },
 });
 
 const diamond = (id: string, x: number, y: number, w: number, h: number, text: string, bg = "transparent"): Skel => ({
-  type: "diamond", id, x, y, width: w, height: h, backgroundColor: bg, fillStyle: "solid", label: { text, fontSize: 18 },
+  type: "diamond",
+  id,
+  x,
+  y,
+  width: w,
+  height: h,
+  backgroundColor: bg,
+  fillStyle: "solid",
+  label: { text, fontSize: 18 },
 });
 
-const text = (x: number, y: number, t: string, fontSize = 20, extra: Skel = {}): Skel => ({ type: "text", x, y, text: t, fontSize, ...extra });
+const text = (x: number, y: number, t: string, fontSize = 20, extra: Skel = {}): Skel => ({
+  type: "text",
+  x,
+  y,
+  text: t,
+  fontSize,
+  ...extra,
+});
 
 const arrow = (from: string, to: string, label?: string): Skel => ({
   type: "arrow",
@@ -80,14 +112,25 @@ function layoutArrows(skeleton: Skel[]): Skel[] {
     const dx = cb.x - ca.x;
     const dy = cb.y - ca.y;
     const len = Math.hypot(dx, dy) || 1;
-    const edge = (box: Skel) => Math.min(box.width / 2 / Math.abs(dx / len || 1e-9), box.height / 2 / Math.abs(dy / len || 1e-9));
+    const edge = (box: Skel) =>
+      Math.min(box.width / 2 / Math.abs(dx / len || 1e-9), box.height / 2 / Math.abs(dy / len || 1e-9));
     const ta = edge(a) + GAP;
     const tb = edge(b) + GAP;
     const sx = ca.x + (dx / len) * ta;
     const sy = ca.y + (dy / len) * ta;
     const ex = cb.x - (dx / len) * tb;
     const ey = cb.y - (dy / len) * tb;
-    return { ...e, x: sx, y: sy, width: ex - sx, height: ey - sy, points: [[0, 0], [ex - sx, ey - sy]] };
+    return {
+      ...e,
+      x: sx,
+      y: sy,
+      width: ex - sx,
+      height: ey - sy,
+      points: [
+        [0, 0],
+        [ex - sx, ey - sy],
+      ],
+    };
   });
 }
 
@@ -107,9 +150,18 @@ const BUILTIN: { id: string; name: string; description: string; skeleton: () => 
       for (let i = 0; i < 12; i++) {
         const col = i % 4;
         const row = Math.floor(i / 4);
-        notes.push(box(`n${i}`, col * 220, 220 + row * 170, 190, 140, "Idea", colors[i % colors.length], { roundness: null, strokeColor: "transparent" }));
+        notes.push(
+          box(`n${i}`, col * 220, 220 + row * 170, 190, 140, "Idea", colors[i % colors.length], {
+            roundness: null,
+            strokeColor: "transparent",
+          }),
+        );
       }
-      return [text(0, 0, "What are we exploring?", 36), text(0, 60, "Dump every idea — sort later.", 20, { strokeColor: "#868e96" }), ...notes];
+      return [
+        text(0, 0, "What are we exploring?", 36),
+        text(0, 60, "Dump every idea — sort later.", 20, { strokeColor: "#868e96" }),
+        ...notes,
+      ];
     },
   },
   {
@@ -169,7 +221,16 @@ const BUILTIN: { id: string; name: string; description: string; skeleton: () => 
       rows.forEach((r, j) => {
         out.push(text(0, 100 + j * 150, r, 20));
         stages.forEach((_, i) =>
-          out.push({ type: "rectangle", x: 180 + i * 220, y: 80 + j * 150, width: 200, height: 130, backgroundColor: rowColor[j], fillStyle: "solid", roundness: { type: 3 } }),
+          out.push({
+            type: "rectangle",
+            x: 180 + i * 220,
+            y: 80 + j * 150,
+            width: 200,
+            height: 130,
+            backgroundColor: rowColor[j],
+            fillStyle: "solid",
+            roundness: { type: 3 },
+          }),
         );
       });
       return out;
@@ -179,13 +240,14 @@ const BUILTIN: { id: string; name: string; description: string; skeleton: () => 
     id: "swot",
     name: "SWOT",
     description: "Strengths, weaknesses, opportunities, threats",
-    skeleton: () => [
-      text(0, -80, "SWOT Analysis", 36),
-      box("s", 0, 0, 400, 300, "Strengths", C.green),
-      box("w", 420, 0, 400, 300, "Weaknesses", C.red),
-      box("o", 0, 320, 400, 300, "Opportunities", C.blue),
-      box("t", 420, 320, 400, 300, "Threats", C.orange),
-    ].map((b) => (b.label ? { ...b, label: { ...b.label, verticalAlign: "top" } } : b)),
+    skeleton: () =>
+      [
+        text(0, -80, "SWOT Analysis", 36),
+        box("s", 0, 0, 400, 300, "Strengths", C.green),
+        box("w", 420, 0, 400, 300, "Weaknesses", C.red),
+        box("o", 0, 320, 400, 300, "Opportunities", C.blue),
+        box("t", 420, 320, 400, 300, "Threats", C.orange),
+      ].map((b) => (b.label ? { ...b, label: { ...b.label, verticalAlign: "top" } } : b)),
   },
   {
     id: "architecture",
@@ -230,10 +292,23 @@ const BUILTIN: { id: string; name: string; description: string; skeleton: () => 
     description: "Goals plus a column for each day",
     skeleton: () => {
       const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      const out: Skel[] = [text(0, -90, "This week", 36), box("g", 0, 0, 1530, 110, "Goals for the week", C.yellow, { label: { text: "Goals for the week", fontSize: 20, verticalAlign: "top", textAlign: "left" } })];
+      const out: Skel[] = [
+        text(0, -90, "This week", 36),
+        box("g", 0, 0, 1530, 110, "Goals for the week", C.yellow, {
+          label: { text: "Goals for the week", fontSize: 20, verticalAlign: "top", textAlign: "left" },
+        }),
+      ];
       days.forEach((d, i) => {
         out.push(box(`d${i}`, i * 220, 140, 200, 50, d, i >= 5 ? C.violet : C.blue));
-        out.push({ type: "rectangle", x: i * 220, y: 200, width: 200, height: 420, strokeStyle: "dashed", roundness: { type: 3 } });
+        out.push({
+          type: "rectangle",
+          x: i * 220,
+          y: 200,
+          width: 200,
+          height: 420,
+          strokeStyle: "dashed",
+          roundness: { type: 3 },
+        });
       });
       return out;
     },
@@ -248,7 +323,15 @@ export const BLANK: Template = {
 };
 
 export function builtinTemplates(): Template[] {
-  return [BLANK, ...BUILTIN.map((t) => ({ id: t.id, name: t.name, description: t.description, build: async () => scene(t.skeleton()) }))];
+  return [
+    BLANK,
+    ...BUILTIN.map((t) => ({
+      id: t.id,
+      name: t.name,
+      description: t.description,
+      build: async () => scene(t.skeleton()),
+    })),
+  ];
 }
 
 export async function userTemplates(): Promise<Template[]> {

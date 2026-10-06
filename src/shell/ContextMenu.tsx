@@ -16,7 +16,10 @@ export type MenuItem =
 
 const useMenu = create<{ x: number; y: number; items: MenuItem[] } | null>(() => null);
 
-export function openContextMenu(e: { clientX: number; clientY: number; preventDefault?: () => void }, items: MenuItem[]) {
+export function openContextMenu(
+  e: { clientX: number; clientY: number; preventDefault?: () => void },
+  items: MenuItem[],
+) {
   e.preventDefault?.();
   useMenu.setState({ x: e.clientX, y: e.clientY, items }, true);
 }
@@ -41,7 +44,13 @@ function MenuList({ items, x, y }: { items: MenuItem[]; x: number; y: number }) 
   }, [x, y]);
 
   return (
-    <div ref={ref} className="menu" style={{ left: pos.x, top: pos.y }} role="menu" onContextMenu={(e) => e.preventDefault()}>
+    <div
+      ref={ref}
+      className="menu"
+      style={{ left: pos.x, top: pos.y }}
+      role="menu"
+      onContextMenu={(e) => e.preventDefault()}
+    >
       {items.map((item, i) =>
         item === "separator" ? (
           <div key={i} className="menu__sep" />

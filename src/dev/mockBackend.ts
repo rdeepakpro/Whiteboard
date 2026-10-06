@@ -69,7 +69,8 @@ function scan(dir: string): any[] {
     const name = base(p);
     if (name.startsWith(".")) continue;
     if (e.kind === "dir") folders.push({ name, path: p, kind: "folder", mtime: e.mtime, children: scan(p) });
-    else if (name.endsWith(".excalidraw")) boards.push({ name: name.replace(/\.excalidraw$/, ""), path: p, kind: "board", mtime: e.mtime });
+    else if (name.endsWith(".excalidraw"))
+      boards.push({ name: name.replace(/\.excalidraw$/, ""), path: p, kind: "board", mtime: e.mtime });
   }
   const sort = (a: any, b: any) => a.name.toLowerCase().localeCompare(b.name.toLowerCase());
   return [...folders.sort(sort), ...boards.sort(sort)];
@@ -133,16 +134,43 @@ const linkCache = new Map<string, any>();
 async function mockPreview(url: string, refresh: boolean) {
   if (!refresh && linkCache.has(url)) return linkCache.get(url);
   await new Promise((r) => setTimeout(r, 700)); // network latency
-  const base = { url, title: null, author: null, description: null, siteName: null, image: null, favicon: null, fetchedAt: Date.now() };
+  const base = {
+    url,
+    title: null,
+    author: null,
+    description: null,
+    siteName: null,
+    image: null,
+    favicon: null,
+    fetchedAt: Date.now(),
+  };
   let p: any;
   if (url.includes("offline")) p = { ...base, kind: "web", status: "offline" };
   else if (/youtu/.test(url)) {
     p = url.includes("deleted")
       ? { ...base, kind: "youtube", siteName: "YouTube", description: "Video unavailable", status: "unavailable" }
-      : { ...base, kind: "youtube", siteName: "YouTube", title: "How We Grew to 10K Users Without Paid Ads — Founder Story", author: "Acme Startup", image: { data: fakePng(320, 180, "#364fc7", "▶ video"), mime: "image/png" }, status: "ok" };
+      : {
+          ...base,
+          kind: "youtube",
+          siteName: "YouTube",
+          title: "How We Grew to 10K Users Without Paid Ads — Founder Story",
+          author: "Acme Startup",
+          image: { data: fakePng(320, 180, "#364fc7", "▶ video"), mime: "image/png" },
+          status: "ok",
+        };
   } else if (/instagram/.test(url)) p = { ...base, kind: "instagram", status: "unavailable" };
   else if (url.includes("noog")) p = { ...base, kind: "web", title: "Plain Page Without Metadata", status: "partial" };
-  else p = { ...base, kind: "web", title: "Product Hunt – The best new products in tech.", description: "Product Hunt is a curation of the best new products, every day.", siteName: "Product Hunt", image: { data: fakePng(600, 314, "#da552f", "og:image"), mime: "image/png" }, favicon: { data: fakePng(32, 32, "#da552f", "P"), mime: "image/png" }, status: "ok" };
+  else
+    p = {
+      ...base,
+      kind: "web",
+      title: "Product Hunt – The best new products in tech.",
+      description: "Product Hunt is a curation of the best new products, every day.",
+      siteName: "Product Hunt",
+      image: { data: fakePng(600, 314, "#da552f", "og:image"), mime: "image/png" },
+      favicon: { data: fakePng(32, 32, "#da552f", "P"), mime: "image/png" },
+      status: "ok",
+    };
   if (p.status === "ok" || p.status === "partial") linkCache.set(url, p);
   return p;
 }
@@ -188,7 +216,9 @@ const handlers: Record<string, (a: any) => unknown> = {
   },
   stat_path: ({ path }) => {
     const e = fs.get(path);
-    return e ? { exists: true, mtime: e.mtime, size: e.kind === "file" ? e.content.length : 0, is_dir: e.kind === "dir" } : { exists: false, mtime: 0, size: 0, is_dir: false };
+    return e
+      ? { exists: true, mtime: e.mtime, size: e.kind === "file" ? e.content.length : 0, is_dir: e.kind === "dir" }
+      : { exists: false, mtime: 0, size: 0, is_dir: false };
   },
   scan_tree: ({ root }) => (mkdirp(root), persist(), scan(root)),
   create_folder: ({ path }) => (fs.has(path) ? err("EXISTS", path) : (mkdirp(path), persist(), null)),
@@ -235,16 +265,19 @@ const handlers: Record<string, (a: any) => unknown> = {
     const list = snapshots(path);
     const latest = list[0];
     if (latest && now() - latest.id < minIntervalMs) return false;
-    if (latest && (fs.get(`${DATA}/history/${fnv(path)}/${latest.id}.excalidraw`) as any)?.content === content) return false;
+    if (latest && (fs.get(`${DATA}/history/${fnv(path)}/${latest.id}.excalidraw`) as any)?.content === content)
+      return false;
     write(`${DATA}/history/${fnv(path)}/${now()}.excalidraw`, content);
     return true;
   },
   history_list: ({ path }) => snapshots(path),
-  history_read: ({ path, id }) => (fs.get(`${DATA}/history/${fnv(path)}/${id}.excalidraw`) as any)?.content ?? err("NOT_FOUND", "snapshot"),
+  history_read: ({ path, id }) =>
+    (fs.get(`${DATA}/history/${fnv(path)}/${id}.excalidraw`) as any)?.content ?? err("NOT_FOUND", "snapshot"),
   rekey_paths: ({ pairs }) => {
     for (const [a, b] of pairs) {
       moveTree(`${DATA}/history/${fnv(a)}`, `${DATA}/history/${fnv(b)}`);
-      if (fs.has(`${DATA}/thumbs/${fnv(a)}.png`)) moveTree(`${DATA}/thumbs/${fnv(a)}.png`, `${DATA}/thumbs/${fnv(b)}.png`);
+      if (fs.has(`${DATA}/thumbs/${fnv(a)}.png`))
+        moveTree(`${DATA}/thumbs/${fnv(a)}.png`, `${DATA}/thumbs/${fnv(b)}.png`);
     }
     return null;
   },
@@ -254,7 +287,14 @@ const handlers: Record<string, (a: any) => unknown> = {
     const dest = `${DATA}/trash/${id}/${base(path)}`;
     const kind = fs.get(path)!.kind === "dir" ? "folder" : "board";
     moveTree(path, dest);
-    const entry = { id, name: base(path).replace(/\.excalidraw$/, ""), originalPath: path, kind, deletedAt: Date.now(), trashedPath: dest };
+    const entry = {
+      id,
+      name: base(path).replace(/\.excalidraw$/, ""),
+      originalPath: path,
+      kind,
+      deletedAt: Date.now(),
+      trashedPath: dest,
+    };
     write(`${DATA}/trash/${id}/.trash.json`, JSON.stringify(entry));
     return entry;
   },
@@ -274,7 +314,8 @@ const handlers: Record<string, (a: any) => unknown> = {
     return target;
   },
   trash_delete: ({ id }) => {
-    for (const k of [...fs.keys()]) if (k === `${DATA}/trash/${id}` || k.startsWith(`${DATA}/trash/${id}/`)) fs.delete(k);
+    for (const k of [...fs.keys()])
+      if (k === `${DATA}/trash/${id}` || k.startsWith(`${DATA}/trash/${id}/`)) fs.delete(k);
     persist();
     return null;
   },
@@ -289,7 +330,10 @@ const handlers: Record<string, (a: any) => unknown> = {
     for (const [p, e] of fs) {
       if (!p.startsWith(root) || !p.endsWith(".excalidraw") || e.kind !== "file") continue;
       try {
-        const text = JSON.parse(e.content).elements.filter((el: any) => !el.isDeleted && el.text).map((el: any) => el.text).join(" · ");
+        const text = JSON.parse(e.content)
+          .elements.filter((el: any) => !el.isDeleted && el.text)
+          .map((el: any) => el.text)
+          .join(" · ");
         const i = text.toLowerCase().indexOf(q);
         if (i >= 0) hits.push({ path: p, snippet: text.slice(Math.max(0, i - 30), i + 50) });
       } catch {
@@ -306,13 +350,33 @@ const handlers: Record<string, (a: any) => unknown> = {
       try {
         const els = JSON.parse(e.content).elements.filter((x: any) => !x.isDeleted);
         const own = els.filter((x: any) => !x.customData?.wbRef);
-        const texts = own.filter((x: any) => x.text).map((x: any) => ({ t: x.text.replace(/\s+/g, " "), size: x.fontSize ?? 20, raw: x.text }));
-        const todos = texts.flatMap((x: any) => x.raw.split("\n")).map((l: string) => l.trim().match(/^(?:todo:?|next:|\[ \]|☐)\s*(.{3,})$/i)?.[1]).filter(Boolean);
+        const texts = own
+          .filter((x: any) => x.text)
+          .map((x: any) => ({ t: x.text.replace(/\s+/g, " "), size: x.fontSize ?? 20, raw: x.text }));
+        const todos = texts
+          .flatMap((x: any) => x.raw.split("\n"))
+          .map((l: string) => l.trim().match(/^(?:todo:?|next:|\[ \]|☐)\s*(.{3,})$/i)?.[1])
+          .filter(Boolean);
         out.push({
           path: p,
           mtime: e.mtime,
           text: texts.map((x: any) => x.t).join(" · "),
-          headings: [...own.filter((x: any) => x.type === "frame" && x.name).map((x: any) => x.name), ...texts.filter((x: any) => x.t.length <= 60 && x.size >= ([...texts].map((t: any) => t.size).sort((a: number, b: number) => a - b)[Math.floor(texts.length / 2)] ?? 20) * 1.4).sort((a: any, b: any) => b.size - a.size).slice(0, 5).map((x: any) => x.t)],
+          headings: [
+            ...own.filter((x: any) => x.type === "frame" && x.name).map((x: any) => x.name),
+            ...texts
+              .filter(
+                (x: any) =>
+                  x.t.length <= 60 &&
+                  x.size >=
+                    ([...texts].map((t: any) => t.size).sort((a: number, b: number) => a - b)[
+                      Math.floor(texts.length / 2)
+                    ] ?? 20) *
+                      1.4,
+              )
+              .sort((a: any, b: any) => b.size - a.size)
+              .slice(0, 5)
+              .map((x: any) => x.t),
+          ],
           todos,
           arrows: els.filter((x: any) => x.type === "arrow").length,
           elements: els.length,
@@ -331,11 +395,13 @@ const handlers: Record<string, (a: any) => unknown> = {
   set_global_capture_shortcut: () => null,
   capture_screen: async ({ mode }) => {
     await new Promise((r) => setTimeout(r, 300));
-    return (window as any).__mockCaptureCancel ? null : fakePng(mode === "screen" ? 1600 : 640, mode === "screen" ? 1000 : 360, "#2b8a3e", `screenshot (${mode})`);
+    return (window as any).__mockCaptureCancel
+      ? null
+      : fakePng(mode === "screen" ? 1600 : 640, mode === "screen" ? 1000 : 360, "#2b8a3e", `screenshot (${mode})`);
   },
   clipboard_image_png: () => fakePng(400, 240, "#862e9c", "clipboard image"),
   "plugin:clipboard-manager|read_text": () => (window as any).__mockClipboardText ?? "",
-  "plugin:clipboard-manager|write_text": ({ text }) => ((window as any).__mockClipboardText = text, null),
+  "plugin:clipboard-manager|write_text": ({ text }) => (((window as any).__mockClipboardText = text), null),
   "plugin:dialog|open": () => dialogQueue.shift() ?? null,
   "plugin:dialog|save": () => dialogQueue.shift() ?? null,
   "plugin:dialog|ask": () => dialogQueue.shift() ?? true,
@@ -356,8 +422,71 @@ if (!fs.size) {
       version: 2,
       source: "https://excalidraw.com",
       elements: [
-        { id: "r1", type: "rectangle", x: 100, y: 100, width: 200, height: 100, angle: 0, strokeColor: "#1e1e1e", backgroundColor: "#a5d8ff", fillStyle: "solid", strokeWidth: 2, strokeStyle: "solid", roughness: 1, opacity: 100, groupIds: [], frameId: null, roundness: { type: 3 }, seed: 1, version: 3, versionNonce: 1, isDeleted: false, boundElements: [{ id: "t1", type: "text" }], updated: 1, link: null, locked: false, index: "a0" },
-        { id: "t1", type: "text", x: 150, y: 137, width: 100, height: 25, angle: 0, strokeColor: "#1e1e1e", backgroundColor: "transparent", fillStyle: "solid", strokeWidth: 2, strokeStyle: "solid", roughness: 1, opacity: 100, groupIds: [], frameId: null, roundness: null, seed: 2, version: 3, versionNonce: 2, isDeleted: false, boundElements: null, updated: 1, link: null, locked: false, text: "Hello world", fontSize: 20, fontFamily: 5, textAlign: "center", verticalAlign: "middle", containerId: "r1", originalText: "Hello world", autoResize: true, lineHeight: 1.25, index: "a1" },
+        {
+          id: "r1",
+          type: "rectangle",
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 100,
+          angle: 0,
+          strokeColor: "#1e1e1e",
+          backgroundColor: "#a5d8ff",
+          fillStyle: "solid",
+          strokeWidth: 2,
+          strokeStyle: "solid",
+          roughness: 1,
+          opacity: 100,
+          groupIds: [],
+          frameId: null,
+          roundness: { type: 3 },
+          seed: 1,
+          version: 3,
+          versionNonce: 1,
+          isDeleted: false,
+          boundElements: [{ id: "t1", type: "text" }],
+          updated: 1,
+          link: null,
+          locked: false,
+          index: "a0",
+        },
+        {
+          id: "t1",
+          type: "text",
+          x: 150,
+          y: 137,
+          width: 100,
+          height: 25,
+          angle: 0,
+          strokeColor: "#1e1e1e",
+          backgroundColor: "transparent",
+          fillStyle: "solid",
+          strokeWidth: 2,
+          strokeStyle: "solid",
+          roughness: 1,
+          opacity: 100,
+          groupIds: [],
+          frameId: null,
+          roundness: null,
+          seed: 2,
+          version: 3,
+          versionNonce: 2,
+          isDeleted: false,
+          boundElements: null,
+          updated: 1,
+          link: null,
+          locked: false,
+          text: "Hello world",
+          fontSize: 20,
+          fontFamily: 5,
+          textAlign: "center",
+          verticalAlign: "middle",
+          containerId: "r1",
+          originalText: "Hello world",
+          autoResize: true,
+          lineHeight: 1.25,
+          index: "a1",
+        },
       ],
       appState: { gridSize: 20, viewBackgroundColor: "#ffffff" },
       files: {},

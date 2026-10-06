@@ -164,8 +164,10 @@ export function weekOutcomes(s = useAction.getState()) {
 /** Why an item can't be added right now (the 3-item limits), or null. */
 export function limitReason(kind: ItemKind): string | null {
   // Finished items don't count: the limit is about open commitments.
-  if (kind === "priority" && todaysPriorities().filter((i) => !i.doneAt).length >= LIMITS.priority) return "Today already has 3 priorities.";
-  if (kind === "week" && weekOutcomes().filter((i) => !i.doneAt).length >= LIMITS.week) return "This week already has 3 outcomes.";
+  if (kind === "priority" && todaysPriorities().filter((i) => !i.doneAt).length >= LIMITS.priority)
+    return "Today already has 3 priorities.";
+  if (kind === "week" && weekOutcomes().filter((i) => !i.doneAt).length >= LIMITS.week)
+    return "This week already has 3 outcomes.";
   return null;
 }
 

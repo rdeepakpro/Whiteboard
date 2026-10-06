@@ -109,7 +109,8 @@ export const image = (k: K, x: number, y: number, w: number, h: number): Skel[] 
   k.line(x + 8, y + h - 8, w - 16, -(h - 16)),
 ];
 
-export const icon = (k: K, x: number, y: number, s = 20): Skel => k.rect(x, y, s, s, { backgroundColor: FILL, strokeColor: LINE, roundness: { type: 3 } });
+export const icon = (k: K, x: number, y: number, s = 20): Skel =>
+  k.rect(x, y, s, s, { backgroundColor: FILL, strokeColor: LINE, roundness: { type: 3 } });
 
 export interface KitItem {
   id: string;
@@ -122,10 +123,12 @@ export type Category = "Screens" | "Navigation" | "Inputs" | "Content" | "Overla
 
 export const CATEGORIES: Category[] = ["Screens", "Navigation", "Inputs", "Content", "Overlays", "Notes"];
 
-const screen = (name: string, w: number, h: number) => (k: K): Skel[] => [
-  { type: "frame", x: 0, y: 0, width: w, height: h, name, children: [] },
-  k.rect(0, 0, w, h, { strokeColor: LINE, roundness: null, backgroundColor: "#ffffff" }),
-];
+const screen =
+  (name: string, w: number, h: number) =>
+  (k: K): Skel[] => [
+    { type: "frame", x: 0, y: 0, width: w, height: h, name, children: [] },
+    k.rect(0, 0, w, h, { strokeColor: "#adb5bd", roundness: null, backgroundColor: "#ffffff" }),
+  ];
 
 export const KIT: KitItem[] = [
   // ------------------------------------------------------------- Screens
@@ -230,7 +233,9 @@ export const KIT: KitItem[] = [
     id: "button",
     name: "Button",
     category: "Inputs",
-    build: (k) => [k.box(0, 0, 140, 44, "Continue", { backgroundColor: ACCENT, strokeColor: ACCENT, labelColor: "#ffffff" })],
+    build: (k) => [
+      k.box(0, 0, 140, 44, "Continue", { backgroundColor: ACCENT, strokeColor: ACCENT, labelColor: "#ffffff" }),
+    ],
   },
   {
     id: "button-secondary",
@@ -367,7 +372,11 @@ export const KIT: KitItem[] = [
     build: (k) => [
       k.rect(0, 0, 320, 200, { strokeColor: LINE }),
       ...[60, 100, 80, 130, 110, 150].map((h, i) =>
-        k.rect(24 + i * 48, 180 - h, 28, h, { backgroundColor: i === 5 ? ACCENT : ACCENT_SOFT, strokeColor: "transparent", roundness: null }),
+        k.rect(24 + i * 48, 180 - h, 28, h, {
+          backgroundColor: i === 5 ? ACCENT : ACCENT_SOFT,
+          strokeColor: "transparent",
+          roundness: null,
+        }),
       ),
       k.line(16, 180, 288, 0),
     ],
@@ -392,7 +401,9 @@ export const KIT: KitItem[] = [
     id: "badge",
     name: "Badge",
     category: "Content",
-    build: (k) => [k.box(0, 0, 72, 26, "New", { backgroundColor: ACCENT_SOFT, strokeColor: "transparent", labelColor: ACCENT }, 13)],
+    build: (k) => [
+      k.box(0, 0, 72, 26, "New", { backgroundColor: ACCENT_SOFT, strokeColor: "transparent", labelColor: ACCENT }, 13),
+    ],
   },
   { id: "divider", name: "Divider", category: "Content", build: (k) => [k.line(0, 0, 320, 0)] },
 
@@ -406,14 +417,24 @@ export const KIT: KitItem[] = [
       k.text(24, 22, "Delete project?", 20),
       k.text(24, 60, "This can't be undone. All boards\nin it will be removed.", 15, { strokeColor: MUTED }),
       k.box(140, 140, 96, 40, "Cancel", { strokeColor: LINE }, 15),
-      k.box(246, 140, 96, 40, "Delete", { backgroundColor: "#e03131", strokeColor: "#e03131", labelColor: "#ffffff" }, 15),
+      k.box(
+        246,
+        140,
+        96,
+        40,
+        "Delete",
+        { backgroundColor: "#e03131", strokeColor: "#e03131", labelColor: "#ffffff" },
+        15,
+      ),
     ],
   },
   {
     id: "toast",
     name: "Toast",
     category: "Overlays",
-    build: (k) => [k.box(0, 0, 280, 48, "Saved ✓", { backgroundColor: INK, strokeColor: INK, labelColor: "#ffffff" }, 15)],
+    build: (k) => [
+      k.box(0, 0, 280, 48, "Saved ✓", { backgroundColor: INK, strokeColor: INK, labelColor: "#ffffff" }, 15),
+    ],
   },
   {
     id: "empty",
@@ -430,7 +451,9 @@ export const KIT: KitItem[] = [
     id: "tooltip",
     name: "Tooltip",
     category: "Overlays",
-    build: (k) => [k.box(0, 0, 160, 34, "Helpful hint", { backgroundColor: INK, strokeColor: INK, labelColor: "#ffffff" }, 13)],
+    build: (k) => [
+      k.box(0, 0, 160, 34, "Helpful hint", { backgroundColor: INK, strokeColor: INK, labelColor: "#ffffff" }, 13),
+    ],
   },
 
   // ---------------------------------------------------------------- Notes
@@ -438,21 +461,51 @@ export const KIT: KitItem[] = [
     id: "sticky",
     name: "Sticky note",
     category: "Notes",
-    build: (k) => [k.box(0, 0, 180, 140, "Idea…", { backgroundColor: "#ffec99", strokeColor: "transparent", roundness: null }, 18)],
+    build: (k) => [
+      k.box(0, 0, 180, 140, "Idea…", { backgroundColor: "#ffec99", strokeColor: "transparent", roundness: null }, 18),
+    ],
   },
   {
     id: "marker",
     name: "Step marker",
     category: "Notes",
-    build: (k) => [k.box(0, 0, 32, 32, "1", { type: "ellipse", backgroundColor: "#e03131", strokeColor: "#e03131", labelColor: "#ffffff" }, 16)],
+    build: (k) => [
+      k.box(
+        0,
+        0,
+        32,
+        32,
+        "1",
+        { type: "ellipse", backgroundColor: "#e03131", strokeColor: "#e03131", labelColor: "#ffffff" },
+        16,
+      ),
+    ],
   },
   {
     id: "callout",
     name: "Callout",
     category: "Notes",
     build: (k) => [
-      k.box(0, 0, 200, 60, "Why is this here?", { backgroundColor: "#fff5f5", strokeColor: "#e03131", labelColor: "#e03131" }, 15),
-      { type: "arrow", x: 100, y: 60, points: [[0, 0], [-40, 70]], strokeColor: "#e03131", roughness: k.roughness },
+      k.box(
+        0,
+        0,
+        200,
+        60,
+        "Why is this here?",
+        { backgroundColor: "#fff5f5", strokeColor: "#e03131", labelColor: "#e03131" },
+        15,
+      ),
+      {
+        type: "arrow",
+        x: 100,
+        y: 60,
+        points: [
+          [0, 0],
+          [-40, 70],
+        ],
+        strokeColor: "#e03131",
+        roughness: k.roughness,
+      },
     ],
   },
 ];

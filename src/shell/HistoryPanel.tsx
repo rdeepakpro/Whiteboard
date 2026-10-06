@@ -33,13 +33,11 @@ export function HistoryPanel() {
     // Make sure the latest state is on disk (and snapshotted) first.
     const session = tab ? sessions.get(tab.id) : null;
     void (session?.flush() ?? Promise.resolve()).finally(reload);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
   // Refresh after saves while the panel is open.
   useEffect(() => {
     if (status && !status.saving) reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.saving]);
 
   const groups = useMemo(() => {
@@ -90,12 +88,22 @@ export function HistoryPanel() {
         <div className="history-preview">
           <div className="history-preview__bar">
             <span>
-              Previewing <strong>{dayLabel(preview.id)}, {formatTime(preview.id)}</strong> — read only
+              Previewing{" "}
+              <strong>
+                {dayLabel(preview.id)}, {formatTime(preview.id)}
+              </strong>{" "}
+              — read only
             </span>
             <div className="row gap">
-              <button className="btn" onClick={() => setPreview(null)}>Close Preview</button>
-              <button className="btn" onClick={duplicate} disabled={!preview.content}>Open as New Board</button>
-              <button className="btn primary" onClick={restore} disabled={!preview.content}>Restore This Version</button>
+              <button className="btn" onClick={() => setPreview(null)}>
+                Close Preview
+              </button>
+              <button className="btn" onClick={duplicate} disabled={!preview.content}>
+                Open as New Board
+              </button>
+              <button className="btn primary" onClick={restore} disabled={!preview.content}>
+                Restore This Version
+              </button>
             </div>
           </div>
           <ScenePreview content={preview.content} />
@@ -124,7 +132,11 @@ export function HistoryPanel() {
             <div key={g.label}>
               <div className="history__day">{g.label}</div>
               {g.items.map((s) => (
-                <button key={s.id} className={`history__item${preview?.id === s.id ? " active" : ""}`} onClick={() => select(s.id)}>
+                <button
+                  key={s.id}
+                  className={`history__item${preview?.id === s.id ? " active" : ""}`}
+                  onClick={() => select(s.id)}
+                >
                   <span>{formatTime(s.id)}</span>
                   <span className="muted">{formatSize(s.size)}</span>
                 </button>

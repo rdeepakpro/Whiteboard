@@ -51,8 +51,12 @@ export function ActionView() {
       <header className="action__bar" data-tauri-drag-region>
         <ModeSwitch />
         <nav className="action__tabs">
-          <button className={tab === "plan" ? "active" : ""} onClick={() => setApp({ actionTab: "plan" })}>Plan</button>
-          <button className={tab === "journey" ? "active" : ""} onClick={() => setApp({ actionTab: "journey" })}>Journey</button>
+          <button className={tab === "plan" ? "active" : ""} onClick={() => setApp({ actionTab: "plan" })}>
+            Plan
+          </button>
+          <button className={tab === "journey" ? "active" : ""} onClick={() => setApp({ actionTab: "journey" })}>
+            Journey
+          </button>
         </nav>
       </header>
       <div className="action__scroll">{tab === "plan" ? <Plan /> : <Journey />}</div>
@@ -98,14 +102,20 @@ function Plan() {
       {due && !checkingIn && (
         <div className="checkin-nudge">
           Wrapping up? A 30-second check-in keeps your journey honest.
-          <button className="linkish" onClick={() => setCheckingIn(true)}>Check in</button>
+          <button className="linkish" onClick={() => setCheckingIn(true)}>
+            Check in
+          </button>
         </div>
       )}
       {checkingIn && <CheckInForm onDone={() => setCheckingIn(false)} />}
 
       <div className="plan__grid">
         <div className="plan__col">
-          <Section title="Today" count={`${priorities.filter((p) => !p.doneAt).length}/3`} hint="Up to three priorities.">
+          <Section
+            title="Today"
+            count={`${priorities.filter((p) => !p.doneAt).length}/3`}
+            hint="Up to three priorities."
+          >
             {priorities.map((i) => (
               <ItemRow key={i.id} item={i} />
             ))}
@@ -168,7 +178,17 @@ function Plan() {
   );
 }
 
-function Section({ title, count, hint, children }: { title: string; count?: string; hint?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  count,
+  hint,
+  children,
+}: {
+  title: string;
+  count?: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="asec">
       <div className="asec__head">
@@ -248,10 +268,20 @@ function rowMenu(item: ActionItem, linkBoard: () => void): MenuItem[] {
   return [
     { label: item.boardPath ? "Change Linked Board…" : "Link to Board…", icon: Icon.board, onSelect: linkBoard },
     ...(item.boardPath
-      ? [{ label: "Unlink Board", onSelect: () => updateItem(item.id, { boardPath: null, elementIds: null }) } as MenuItem]
+      ? [
+          {
+            label: "Unlink Board",
+            onSelect: () => updateItem(item.id, { boardPath: null, elementIds: null }),
+          } as MenuItem,
+        ]
       : []),
     ...(item.kind === "priority" && item.date !== dayKey()
-      ? [{ label: "Move to Today", onSelect: () => !moveToToday(item.id) && toast("Today already has 3 priorities.") } as MenuItem]
+      ? [
+          {
+            label: "Move to Today",
+            onSelect: () => !moveToToday(item.id) && toast("Today already has 3 priorities."),
+          } as MenuItem,
+        ]
       : []),
     "separator",
     { label: "Delete", icon: Icon.trash, danger: true, onSelect: () => removeItem(item.id) },
@@ -273,7 +303,10 @@ function ItemRow({ item, extra, doneLabel }: { item: ActionItem; extra?: React.R
         className="icon-btn small arow__more"
         onClick={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
-          openContextMenu({ clientX: r.left, clientY: r.bottom + 2 }, rowMenu(item, () => setPicking(true)));
+          openContextMenu(
+            { clientX: r.left, clientY: r.bottom + 2 },
+            rowMenu(item, () => setPicking(true)),
+          );
         }}
       >
         {Icon.more}
@@ -335,7 +368,10 @@ function MoveRow({ item }: { item: ActionItem }) {
         className="icon-btn small arow__more"
         onClick={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
-          openContextMenu({ clientX: r.left, clientY: r.bottom + 2 }, rowMenu(item, () => setPicking(true)));
+          openContextMenu(
+            { clientX: r.left, clientY: r.bottom + 2 },
+            rowMenu(item, () => setPicking(true)),
+          );
         }}
       >
         {Icon.more}
@@ -373,7 +409,15 @@ function Countdown({ item }: { item: ActionItem }) {
     );
   }
   const n = daysUntil(item.date);
-  const text = item.doneAt ? "reached" : n === 0 ? "today" : n === 1 ? "tomorrow" : n > 0 ? `${n} days` : `${-n} days ago`;
+  const text = item.doneAt
+    ? "reached"
+    : n === 0
+      ? "today"
+      : n === 1
+        ? "tomorrow"
+        : n > 0
+          ? `${n} days`
+          : `${-n} days ago`;
   return (
     <button
       className={`countdown${n < 0 && !item.doneAt ? " late" : ""}${n >= 0 && n <= 7 && !item.doneAt ? " soon" : ""}`}
@@ -453,8 +497,19 @@ function AddMilestone() {
   return (
     <div className="add-row two">
       <span className="add-row__plus">{Icon.plus}</span>
-      <input value={title} placeholder="Milestone (e.g. 100 users)" onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} />
-      <input type="date" className="date-input" value={date} onChange={(e) => setDate(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} />
+      <input
+        value={title}
+        placeholder="Milestone (e.g. 100 users)"
+        onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && submit()}
+      />
+      <input
+        type="date"
+        className="date-input"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && submit()}
+      />
     </div>
   );
 }
@@ -501,8 +556,12 @@ function CheckInForm({ onDone }: { onDone: () => void }) {
         <textarea rows={1} value={blocking} onChange={(e) => setBlocking(e.target.value)} />
       </label>
       <div className="checkin__actions">
-        <button className="btn" onClick={onDone}>Not now</button>
-        <button className="btn primary" onClick={save}>Save check-in</button>
+        <button className="btn" onClick={onDone}>
+          Not now
+        </button>
+        <button className="btn primary" onClick={save}>
+          Save check-in
+        </button>
       </div>
     </div>
   );

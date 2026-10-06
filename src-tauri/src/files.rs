@@ -50,10 +50,7 @@ pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), String> {
         .parent()
         .ok_or_else(|| "INVALID: path has no parent".to_string())?;
     fs::create_dir_all(dir).map_err(|e| err(e, "create folder"))?;
-    let file_name = path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("board");
+    let file_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("board");
     static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let n = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let tmp = dir.join(format!(".{file_name}.wb-tmp-{}-{n}", std::process::id()));
@@ -347,12 +344,7 @@ pub fn unique_path(dir: String, base: String, ext: Option<String>) -> String {
 /// exposes name, size and modification time). Checks the usual places first,
 /// then asks Spotlight. Returns None when no unambiguous match exists.
 #[tauri::command]
-pub fn locate_file(
-    name: String,
-    size: u64,
-    mtime: u64,
-    hints: Vec<String>,
-) -> Option<String> {
+pub fn locate_file(name: String, size: u64, mtime: u64, hints: Vec<String>) -> Option<String> {
     let matches = |p: &Path| -> bool {
         fs::metadata(p)
             .map(|m| m.is_file() && m.len() == size)
@@ -400,7 +392,8 @@ mod tests {
         d
     }
 
-    const SCENE: &str = r#"{"type":"excalidraw","version":2,"elements":[],"appState":{},"files":{}}"#;
+    const SCENE: &str =
+        r#"{"type":"excalidraw","version":2,"elements":[],"appState":{},"files":{}}"#;
 
     #[test]
     fn atomic_write_replaces_without_leftovers() {
@@ -409,8 +402,16 @@ mod tests {
         atomic_write(&p, b"one").unwrap();
         atomic_write(&p, b"two").unwrap();
         assert_eq!(fs::read_to_string(&p).unwrap(), "two");
-        let names: Vec<_> = fs::read_dir(&d).unwrap().flatten().map(|e| e.file_name()).collect();
-        assert_eq!(names.len(), 1, "temp files must not be left behind: {names:?}");
+        let names: Vec<_> = fs::read_dir(&d)
+            .unwrap()
+            .flatten()
+            .map(|e| e.file_name())
+            .collect();
+        assert_eq!(
+            names.len(),
+            1,
+            "temp files must not be left behind: {names:?}"
+        );
     }
 
     #[test]
@@ -420,9 +421,18 @@ mod tests {
         fs::write(&p, SCENE).unwrap();
         let err = write_board(p.to_string_lossy().into(), "{not json".into(), None).unwrap_err();
         assert!(err.starts_with("INVALID"));
-        let err = write_board(p.to_string_lossy().into(), r#"{"type":"other"}"#.into(), None).unwrap_err();
+        let err = write_board(
+            p.to_string_lossy().into(),
+            r#"{"type":"other"}"#.into(),
+            None,
+        )
+        .unwrap_err();
         assert!(err.starts_with("INVALID"));
-        assert_eq!(fs::read_to_string(&p).unwrap(), SCENE, "good file must be untouched");
+        assert_eq!(
+            fs::read_to_string(&p).unwrap(),
+            SCENE,
+            "good file must be untouched"
+        );
     }
 
     #[test]
@@ -451,21 +461,32 @@ mod tests {
         let a = d.join("a.excalidraw").to_string_lossy().to_string();
         let b = d.join("b.excalidraw").to_string_lossy().to_string();
         create_board(a.clone(), SCENE.into()).unwrap();
-        assert!(create_board(a.clone(), SCENE.into()).unwrap_err().starts_with("EXISTS"));
+        assert!(create_board(a.clone(), SCENE.into())
+            .unwrap_err()
+            .starts_with("EXISTS"));
         create_board(b.clone(), SCENE.into()).unwrap();
-        assert!(move_path(a.clone(), b.clone()).unwrap_err().starts_with("EXISTS"));
+        assert!(move_path(a.clone(), b.clone())
+            .unwrap_err()
+            .starts_with("EXISTS"));
         let sub = d.join("sub");
         fs::create_dir(&sub).unwrap();
-        assert!(move_path(d.to_string_lossy().into(), sub.join("x").to_string_lossy().into())
-            .unwrap_err()
-            .starts_with("INVALID"));
+        assert!(move_path(
+            d.to_string_lossy().into(),
+            sub.join("x").to_string_lossy().into()
+        )
+        .unwrap_err()
+        .starts_with("INVALID"));
     }
 
     #[test]
     fn unique_path_increments() {
         let d = tmpdir("unique");
         let dir = d.to_string_lossy().to_string();
-        let p1 = unique_path(dir.clone(), "Untitled Whiteboard".into(), Some("excalidraw".into()));
+        let p1 = unique_path(
+            dir.clone(),
+            "Untitled Whiteboard".into(),
+            Some("excalidraw".into()),
+        );
         assert!(p1.ends_with("/Untitled Whiteboard.excalidraw"));
         fs::write(&p1, SCENE).unwrap();
         let p2 = unique_path(dir, "Untitled Whiteboard".into(), Some("excalidraw".into()));

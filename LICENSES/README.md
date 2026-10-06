@@ -1,7 +1,8 @@
 # Licenses & Acknowledgements
 
-Whiteboard is a personal desktop shell around the **official Excalidraw editor**.
-Whiteboard's own code is separate from Excalidraw; Excalidraw is used unmodified
+Whiteboard is a desktop shell around the **official Excalidraw editor**.
+Whiteboard's own code is MIT-licensed (see [`../LICENSE`](../LICENSE)) and is
+separate from Excalidraw; Excalidraw is used unmodified
 via the `@excalidraw/excalidraw` npm package (v0.18.1). "Excalidraw" is the name
 of the upstream project; Whiteboard is not affiliated with or endorsed by it and
 does not use the Excalidraw logo as its identity.

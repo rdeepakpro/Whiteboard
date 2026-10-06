@@ -80,10 +80,12 @@ export async function requestQuit() {
       }),
     );
     if (failed.length) {
-      const quit = await ask(
-        `Some changes couldn't be saved (${failed.join(", ")}). Quit anyway and lose them?`,
-        { title: "Unsaved changes", kind: "warning", okLabel: "Quit Anyway", cancelLabel: "Don't Quit" },
-      );
+      const quit = await ask(`Some changes couldn't be saved (${failed.join(", ")}). Quit anyway and lose them?`, {
+        title: "Unsaved changes",
+        kind: "warning",
+        okLabel: "Quit Anyway",
+        cancelLabel: "Don't Quit",
+      });
       if (!quit) {
         quitting = false;
         return;
@@ -148,12 +150,15 @@ function installDropHandling() {
     e.preventDefault();
     for (const f of Array.from(e.dataTransfer?.files ?? [])) {
       if (/\.excalidrawlib$/i.test(f.name)) {
-        void f.text().then(async (t) => {
-          const { loadLibraryFromBlob } = await import("@excalidraw/excalidraw");
-          const items = await loadLibraryFromBlob(new Blob([t]), "unpublished");
-          onLibraryChange(mergeLibraryItems(libraryItems(), items));
-          toast(`Added ${items.length} item${items.length === 1 ? "" : "s"} to your library`);
-        }).catch(() => toast("That file isn't a valid Excalidraw library.", "error"));
+        void f
+          .text()
+          .then(async (t) => {
+            const { loadLibraryFromBlob } = await import("@excalidraw/excalidraw");
+            const items = await loadLibraryFromBlob(new Blob([t]), "unpublished");
+            onLibraryChange(mergeLibraryItems(libraryItems(), items));
+            toast(`Added ${items.length} item${items.length === 1 ? "" : "s"} to your library`);
+          })
+          .catch(() => toast("That file isn't a valid Excalidraw library.", "error"));
       } else {
         toast("Open a board, then drop images onto its canvas.");
       }
@@ -178,7 +183,8 @@ function installListeners() {
   installSendToActionMenu();
   applyGlobalCaptureShortcut(getApp().prefs.globalCaptureShortcut);
   useApp.subscribe((s, prev) => {
-    if (s.prefs.globalCaptureShortcut !== prev.prefs.globalCaptureShortcut) applyGlobalCaptureShortcut(s.prefs.globalCaptureShortcut);
+    if (s.prefs.globalCaptureShortcut !== prev.prefs.globalCaptureShortcut)
+      applyGlobalCaptureShortcut(s.prefs.globalCaptureShortcut);
   });
 
   // External change detection: on focus, and periodically for open boards.
@@ -193,7 +199,9 @@ function installListeners() {
   }, 3000);
 
   // Theme follows the OS when set to "system".
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (ev) => setApp({ systemDark: ev.matches }));
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (ev) => setApp({ systemDark: ev.matches }));
 
   // Persist session-ish state on any relevant change.
   useApp.subscribe((s, prev) => {
@@ -230,7 +238,8 @@ function installListeners() {
     }, 250);
   };
   useApp.subscribe((s, prev) => {
-    if (s.recents !== prev.recents || s.prefs.theme !== prev.prefs.theme || s.activeTabId !== prev.activeTabId) syncMenu();
+    if (s.recents !== prev.recents || s.prefs.theme !== prev.prefs.theme || s.activeTabId !== prev.activeTabId)
+      syncMenu();
   });
   syncMenu();
 

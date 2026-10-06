@@ -184,10 +184,14 @@ function onKeyDown(e: KeyboardEvent) {
 }
 
 export function installRefInteractions() {
-  window.addEventListener("pointermove", (e) => {
-    lastClient.x = e.clientX;
-    lastClient.y = e.clientY;
-  }, { passive: true, capture: true });
+  window.addEventListener(
+    "pointermove",
+    (e) => {
+      lastClient.x = e.clientX;
+      lastClient.y = e.clientY;
+    },
+    { passive: true, capture: true },
+  );
   window.addEventListener("paste", onPaste, true);
   window.addEventListener("dragover", onDragOver, true);
   window.addEventListener("drop", onDrop, true);

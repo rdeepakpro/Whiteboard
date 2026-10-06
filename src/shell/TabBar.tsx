@@ -126,7 +126,9 @@ const TabButton = memo(function TabButton({
       )}
       <span className="tab__end">
         {problem ? (
-          <span className="tab__warn" title="Needs attention">!</span>
+          <span className="tab__warn" title="Needs attention">
+            !
+          </span>
         ) : status.dirty ? (
           <span className="tab__dot" />
         ) : null}
@@ -146,4 +148,3 @@ const TabButton = memo(function TabButton({
     </div>
   );
 });
-

@@ -124,7 +124,9 @@ export async function replaceSelectedImage() {
     toast("Select an image first.");
     return;
   }
-  const picked = await openDialog({ filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "svg"] }] });
+  const picked = await openDialog({
+    filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "svg"] }],
+  });
   if (typeof picked !== "string") return;
   try {
     const img = await prepareImage(await readFileAsFile(picked));
@@ -132,7 +134,17 @@ export async function replaceSelectedImage() {
     const height = (target.width * img.height) / img.width;
     api.updateScene({
       elements: api.getSceneElementsIncludingDeleted().map((e) =>
-        e.id === target.id ? ({ ...e, fileId: img.fileId, height, status: "pending", crop: null, version: e.version + 1, versionNonce: Math.floor(Math.random() * 2 ** 31) } as any) : e,
+        e.id === target.id
+          ? ({
+              ...e,
+              fileId: img.fileId,
+              height,
+              status: "pending",
+              crop: null,
+              version: e.version + 1,
+              versionNonce: Math.floor(Math.random() * 2 ** 31),
+            } as any)
+          : e,
       ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });

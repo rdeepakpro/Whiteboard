@@ -3,6 +3,8 @@ name = "whiteboard"
 version = "1.0.0"
 description = "Whiteboard — a personal desktop home for Excalidraw boards"
 edition = "2021"
+license = "MIT"
+publish = false
 
 [lib]
 name = "whiteboard_lib"

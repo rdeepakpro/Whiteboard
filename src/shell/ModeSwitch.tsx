@@ -16,10 +16,22 @@ export function ModeSwitch() {
   const due = useCheckInDue();
   return (
     <div className="mode-switch" role="tablist" aria-label="Brainstorm or Action">
-      <button role="tab" aria-selected={mode === "brainstorm"} className={mode === "brainstorm" ? "active" : ""} onClick={() => setMode("brainstorm")} title="Brainstorm (⇧⌘A to switch)">
+      <button
+        role="tab"
+        aria-selected={mode === "brainstorm"}
+        className={mode === "brainstorm" ? "active" : ""}
+        onClick={() => setMode("brainstorm")}
+        title="Brainstorm (⇧⌘A to switch)"
+      >
         Brainstorm
       </button>
-      <button role="tab" aria-selected={mode === "action"} className={mode === "action" ? "active" : ""} onClick={() => setMode("action")} title="Action (⇧⌘A to switch)">
+      <button
+        role="tab"
+        aria-selected={mode === "action"}
+        className={mode === "action" ? "active" : ""}
+        onClick={() => setMode("action")}
+        title="Action (⇧⌘A to switch)"
+      >
         Action
         {due && mode !== "action" && <span className="mode-switch__dot" title="Daily check-in" />}
       </button>

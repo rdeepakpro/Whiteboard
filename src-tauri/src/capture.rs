@@ -54,7 +54,11 @@ static CAPTURING: AtomicBool = AtomicBool::new(false);
 /// Runs the capture. `mode`: "region" | "window" | "screen". Returns the PNG
 /// as base64, or None when the user cancelled (Esc).
 #[tauri::command]
-pub async fn capture_screen(app: AppHandle, mode: String, hide_app: bool) -> Result<Option<String>, String> {
+pub async fn capture_screen(
+    app: AppHandle,
+    mode: String,
+    hide_app: bool,
+) -> Result<Option<String>, String> {
     if CAPTURING.swap(true, Ordering::SeqCst) {
         return Ok(None); // a capture is already in progress
     }
@@ -100,13 +104,17 @@ pub async fn capture_screen(app: AppHandle, mode: String, hide_app: bool) -> Res
         _ => return Err("IO: couldn't run the macOS screenshot tool".into()),
     }
     // No file means the user pressed Esc.
-    let Ok(bytes) = fs::read(&file) else { return Ok(None) };
+    let Ok(bytes) = fs::read(&file) else {
+        return Ok(None);
+    };
     let _ = fs::remove_file(&file);
     if bytes.is_empty() {
         return Ok(None);
     }
     use base64::Engine;
-    Ok(Some(base64::engine::general_purpose::STANDARD.encode(bytes)))
+    Ok(Some(
+        base64::engine::general_purpose::STANDARD.encode(bytes),
+    ))
 }
 
 pub const CAPTURE_SHORTCUT: &str = "CmdOrCtrl+Shift+2";

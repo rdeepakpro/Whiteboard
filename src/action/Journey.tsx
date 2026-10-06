@@ -52,7 +52,10 @@ export function Journey() {
     return (
       <div className="journey empty">
         <h1>Startup Journey</h1>
-        <p>Your daily check-ins and everything you finish will collect here, in order — a quiet record of how the company got built.</p>
+        <p>
+          Your daily check-ins and everything you finish will collect here, in order — a quiet record of how the company
+          got built.
+        </p>
       </div>
     );
   }
@@ -99,16 +102,34 @@ function Week({ weekStart, days }: { weekStart: string; days: Day[] }) {
           <div className="jday__body">
             {d.checkIn && (
               <div className="jcheckin">
-                {d.checkIn.moved && <p><span>Moved forward</span>{d.checkIn.moved}</p>}
-                {d.checkIn.tomorrow && <p><span>Most important next</span>{d.checkIn.tomorrow}</p>}
-                {d.checkIn.blocking && <p className="blocked"><span>Blocked by</span>{d.checkIn.blocking}</p>}
+                {d.checkIn.moved && (
+                  <p>
+                    <span>Moved forward</span>
+                    {d.checkIn.moved}
+                  </p>
+                )}
+                {d.checkIn.tomorrow && (
+                  <p>
+                    <span>Most important next</span>
+                    {d.checkIn.tomorrow}
+                  </p>
+                )}
+                {d.checkIn.blocking && (
+                  <p className="blocked">
+                    <span>Blocked by</span>
+                    {d.checkIn.blocking}
+                  </p>
+                )}
               </div>
             )}
             {d.done.map((i) => (
               <div key={i.id} className="jdone">
                 <span className="jdone__check">{Icon.check}</span>
                 <span className="jdone__kind">{KIND_LABEL[i.kind]}</span>
-                <span>{i.goal && i.kind === "move" ? `${i.goal}: ` : ""}{i.title}</span>
+                <span>
+                  {i.goal && i.kind === "move" ? `${i.goal}: ` : ""}
+                  {i.title}
+                </span>
                 {i.boardPath && (
                   <button className="board-chip" onClick={() => openLinkedBoard(i)}>
                     {Icon.board}

@@ -22,7 +22,17 @@ import { buildKitElements, CATEGORIES, KIT, type KitItem, type KitStyle } from "
 export const DESIGN_SIDEBAR = "wb-design";
 
 export const designIcon = (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.25}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
     <rect x="3" y="3" width="6" height="6" rx="1.5" />
     <rect x="11" y="3" width="6" height="6" rx="3" />
     <rect x="3" y="11" width="6" height="6" rx="1.5" />
@@ -55,7 +65,7 @@ export function insertKitItem(api: ExcalidrawImperativeAPI, item: KitItem, style
   const frame =
     item.category === "Screens"
       ? null
-      : scene.find((e) => e.type === "frame" && (selected[e.id] || e.id === sel?.frameId)) ?? null;
+      : (scene.find((e) => e.type === "frame" && (selected[e.id] || e.id === sel?.frameId)) ?? null);
   let left: number;
   let top: number;
   if (frame) {
@@ -79,13 +89,21 @@ export function insertKitItem(api: ExcalidrawImperativeAPI, item: KitItem, style
   const dx = left - x1;
   const dy = top - y1;
   const placed = built.map(
-    (e) => ({ ...e, x: e.x + dx, y: e.y + dy, ...(frame && e.type !== "frame" ? { frameId: frame.id } : {}) }) as ExcalidrawElement,
+    (e) =>
+      ({
+        ...e,
+        x: e.x + dx,
+        y: e.y + dy,
+        ...(frame && e.type !== "frame" ? { frameId: frame.id } : {}),
+      }) as ExcalidrawElement,
   );
   const groupId = placed.find((e) => e.groupIds.length)?.groupIds[0];
   api.updateScene({
     elements: [...api.getSceneElementsIncludingDeleted(), ...placed],
     appState: {
-      selectedElementIds: Object.fromEntries(placed.filter((e) => e.type !== "frame" || item.category === "Screens").map((e) => [e.id, true])),
+      selectedElementIds: Object.fromEntries(
+        placed.filter((e) => e.type !== "frame" || item.category === "Screens").map((e) => [e.id, true]),
+      ),
       selectedGroupIds: groupId ? { [groupId]: true } : {},
     } as any,
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -146,7 +164,11 @@ export function DesignPanel({ getApi }: { getApi: () => ExcalidrawImperativeAPI 
   const addToLibrary = async () => {
     const api = getApi();
     if (!api) return;
-    await api.updateLibrary({ libraryItems: KIT.map((i) => libraryItem(i, style)) as unknown as LibraryItems, merge: true, openLibraryMenu: true });
+    await api.updateLibrary({
+      libraryItems: KIT.map((i) => libraryItem(i, style)) as unknown as LibraryItems,
+      merge: true,
+      openLibraryMenu: true,
+    });
     toast(`Added ${KIT.length} pieces to your Library`);
   };
 
@@ -159,12 +181,24 @@ export function DesignPanel({ getApi }: { getApi: () => ExcalidrawImperativeAPI 
         <div className="wb-kit__controls">
           <div className="wb-kit__seg" role="radiogroup" aria-label="Style">
             {(["clean", "sketchy"] as KitStyle[]).map((s) => (
-              <button key={s} role="radio" aria-checked={style === s} className={style === s ? "active" : ""} onClick={() => setPref({ designStyle: s })}>
+              <button
+                key={s}
+                role="radio"
+                aria-checked={style === s}
+                className={style === s ? "active" : ""}
+                onClick={() => setPref({ designStyle: s })}
+              >
                 {s === "clean" ? "Clean" : "Sketchy"}
               </button>
             ))}
           </div>
-          <input className="wb-kit__search" placeholder="Find a piece…" value={query} onChange={(e) => setQuery(e.target.value)} spellCheck={false} />
+          <input
+            className="wb-kit__search"
+            placeholder="Find a piece…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            spellCheck={false}
+          />
         </div>
         <div className="wb-kit__scroll">
           {groups.map((g) => (
@@ -178,7 +212,10 @@ export function DesignPanel({ getApi }: { getApi: () => ExcalidrawImperativeAPI 
                     title={`${item.name} — click to add, or drag onto the canvas`}
                     draggable
                     onDragStart={(e) => {
-                      e.dataTransfer.setData(LIB_MIME, serializeLibraryAsJSON([libraryItem(item, style)] as unknown as LibraryItems));
+                      e.dataTransfer.setData(
+                        LIB_MIME,
+                        serializeLibraryAsJSON([libraryItem(item, style)] as unknown as LibraryItems),
+                      );
                       e.dataTransfer.effectAllowed = "copy";
                     }}
                     onClick={() => {

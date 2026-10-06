@@ -26,15 +26,20 @@ function buildScene(style: KitStyle, frames: Frame[], extra: (k: K) => Skel[] = 
   const k = kitFor(style);
   const out: ExcalidrawElement[] = [];
   for (const f of frames) {
-    const [frame] = convertToExcalidrawElements([{ type: "frame", x: f.x, y: f.y, width: f.w, height: f.h, name: f.name, children: [] } as any], {
-      regenerateIds: true,
-    });
+    const [frame] = convertToExcalidrawElements(
+      [{ type: "frame", x: f.x, y: f.y, width: f.w, height: f.h, name: f.name, children: [] } as any],
+      {
+        regenerateIds: true,
+      },
+    );
     const body = [k.rect(0, 0, f.w, f.h, { strokeColor: LINE, roundness: null }), ...f.body(k)].map((s) => ({
       ...s,
       x: (s.x ?? 0) + f.x,
       y: (s.y ?? 0) + f.y,
     }));
-    const inner = convertToExcalidrawElements(body as any, { regenerateIds: true }).map((e) => ({ ...e, frameId: frame.id }) as ExcalidrawElement);
+    const inner = convertToExcalidrawElements(body as any, { regenerateIds: true }).map(
+      (e) => ({ ...e, frameId: frame.id }) as ExcalidrawElement,
+    );
     out.push(frame, ...inner);
   }
   out.push(...convertToExcalidrawElements(extra(k) as any, { regenerateIds: true }));
@@ -56,11 +61,24 @@ const field = (k: K, x: number, y: number, label: string, hint: string): Skel[] 
 ];
 const toggleRow = (k: K, y: number, label: string, on: boolean): Skel[] => [
   k.text(24, y + 4, label, 16),
-  k.rect(318, y, 48, 28, { backgroundColor: on ? ACCENT : FILL, strokeColor: on ? ACCENT : LINE, roundness: { type: 3 } }),
+  k.rect(318, y, 48, 28, {
+    backgroundColor: on ? ACCENT : FILL,
+    strokeColor: on ? ACCENT : LINE,
+    roundness: { type: 3 },
+  }),
   k.ellipse(on ? 341 : 321, y + 3, 22, 22, { strokeColor: on ? "#ffffff" : LINE }),
   k.line(24, y + 46, 342, 0),
 ];
-const stepArrow = (x1: number, x2: number): Skel => ({ type: "arrow", x: x1, y: 422, points: [[0, 0], [x2 - x1, 0]], strokeColor: MUTED });
+const stepArrow = (x1: number, x2: number): Skel => ({
+  type: "arrow",
+  x: x1,
+  y: 422,
+  points: [
+    [0, 0],
+    [x2 - x1, 0],
+  ],
+  strokeColor: MUTED,
+});
 
 export interface DesignTemplate {
   id: string;
@@ -134,7 +152,10 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
             ...status(k),
             ...appBar(k, "Your goal"),
             ...["Launch a product", "Plan a project", "Study better"].flatMap((t, i) => [
-              k.box(24, 140 + i * 84, 342, 68, t, { strokeColor: i === 0 ? ACCENT : LINE, backgroundColor: i === 0 ? ACCENT_SOFT : "#ffffff" }),
+              k.box(24, 140 + i * 84, 342, 68, t, {
+                strokeColor: i === 0 ? ACCENT : LINE,
+                backgroundColor: i === 0 ? ACCENT_SOFT : "#ffffff",
+              }),
             ]),
             primary(k, 24, 720, 342, "Continue"),
           ]),
@@ -149,7 +170,10 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
               k.text(82, 210 + i * 72, "Edited today", 13, { strokeColor: MUTED }),
             ]),
             k.rect(0, 772, 390, 72, { strokeColor: LINE, roundness: null }),
-            ...["Home", "Search", "Profile"].flatMap((t, i) => [icon(k, 70 + i * 120, 784, 22), k.text(62 + i * 120, 812, t, 12, { strokeColor: i === 0 ? ACCENT : MUTED })]),
+            ...["Home", "Search", "Profile"].flatMap((t, i) => [
+              icon(k, 70 + i * 120, 784, 22),
+              k.text(62 + i * 120, 812, t, 12, { strokeColor: i === 0 ? ACCENT : MUTED }),
+            ]),
           ]),
         ],
         () => [stepArrow(400, 470), stepArrow(880, 950)],
@@ -173,7 +197,11 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
             k.text(780, 22, "Product", 16),
             k.text(880, 22, "Pricing", 16),
             k.text(975, 22, "About", 16),
-            k.box(1100, 14, 140, 36, "Sign up", { backgroundColor: ACCENT, strokeColor: ACCENT, labelColor: "#ffffff" }),
+            k.box(1100, 14, 140, 36, "Sign up", {
+              backgroundColor: ACCENT,
+              strokeColor: ACCENT,
+              labelColor: "#ffffff",
+            }),
             k.text(80, 170, "The headline that\nsays what you do", 48),
             k.text(80, 310, "One sentence about who it's for and why it matters.", 18, { strokeColor: MUTED }),
             primary(k, 80, 370, 180, "Get started"),
@@ -205,7 +233,9 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
             k.rect(0, 0, 220, 800, { backgroundColor: FILL, strokeColor: LINE, roundness: null }),
             k.text(24, 24, "Acme", 20),
             ...["Overview", "Customers", "Revenue", "Settings"].flatMap((t, i) => [
-              ...(i === 0 ? [k.rect(12, 74, 196, 36, { backgroundColor: ACCENT_SOFT, strokeColor: "transparent" })] : []),
+              ...(i === 0
+                ? [k.rect(12, 74, 196, 36, { backgroundColor: ACCENT_SOFT, strokeColor: "transparent" })]
+                : []),
               k.text(28, 82 + i * 44, t, 15, { strokeColor: i === 0 ? ACCENT : INK }),
             ]),
             k.text(260, 28, "Overview", 26),
@@ -216,7 +246,11 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
             ]),
             k.rect(260, 236, 640, 300, { strokeColor: LINE }),
             ...[90, 140, 120, 180, 160, 220, 200, 250].map((h, i) =>
-              k.rect(292 + i * 74, 512 - h, 40, h, { backgroundColor: i === 7 ? ACCENT : ACCENT_SOFT, strokeColor: "transparent", roundness: null }),
+              k.rect(292 + i * 74, 512 - h, 40, h, {
+                backgroundColor: i === 7 ? ACCENT : ACCENT_SOFT,
+                strokeColor: "transparent",
+                roundness: null,
+              }),
             ),
             k.rect(920, 236, 310, 300, { strokeColor: LINE }),
             k.text(940, 254, "Recent activity", 16),
@@ -242,7 +276,11 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
           ...toggleRow(k, 206, "Email digest", false),
           ...toggleRow(k, 262, "Weekly summary", true),
           k.text(24, 344, "ACCOUNT", 12, { strokeColor: MUTED }),
-          ...["Profile", "Privacy", "Subscription"].flatMap((t, i) => [k.text(24, 374 + i * 52, t, 16), k.text(350, 372 + i * 52, "›", 20, { strokeColor: MUTED }), k.line(24, 410 + i * 52, 342, 0)]),
+          ...["Profile", "Privacy", "Subscription"].flatMap((t, i) => [
+            k.text(24, 374 + i * 52, t, 16),
+            k.text(350, 372 + i * 52, "›", 20, { strokeColor: MUTED }),
+            k.line(24, 410 + i * 52, 342, 0),
+          ]),
           k.box(24, 560, 342, 48, "Log out", { strokeColor: "#e03131", labelColor: "#e03131" }),
         ]),
       ]),

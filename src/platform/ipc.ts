@@ -86,8 +86,7 @@ export const ipc = {
   createBoard: (path: string, content: string) => invoke<number>("create_board", { path, content }),
   movePath: (from: string, to: string) => invoke<void>("move_path", { from, to }),
   copyFile: (from: string, to: string) => invoke<void>("copy_file", { from, to }),
-  uniquePath: (dir: string, base: string, ext: string | null) =>
-    invoke<string>("unique_path", { dir, base, ext }),
+  uniquePath: (dir: string, base: string, ext: string | null) => invoke<string>("unique_path", { dir, base, ext }),
 
   locateFile: (name: string, size: number, mtime: number, hints: string[]) =>
     invoke<string | null>("locate_file", { name, size, mtime, hints }),

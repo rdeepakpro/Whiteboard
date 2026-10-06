@@ -36,7 +36,9 @@ pub struct TextHit {
 }
 
 fn collect_boards(dir: &Path, out: &mut Vec<PathBuf>, depth: usize) {
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for e in entries.flatten() {
         let name = e.file_name();
         if name.to_string_lossy().starts_with('.') {
@@ -54,9 +56,24 @@ fn collect_boards(dir: &Path, out: &mut Vec<PathBuf>, depth: usize) {
 fn is_todo(line: &str) -> Option<String> {
     let l = line.trim();
     let lower = l.to_lowercase();
-    for prefix in ["todo:", "todo ", "to do:", "next:", "next step:", "next steps:", "action:", "[ ]", "☐", "- [ ]", "* [ ]"] {
+    for prefix in [
+        "todo:",
+        "todo ",
+        "to do:",
+        "next:",
+        "next step:",
+        "next steps:",
+        "action:",
+        "[ ]",
+        "☐",
+        "- [ ]",
+        "* [ ]",
+    ] {
         if lower.starts_with(prefix) {
-            let rest = l[prefix.len()..].trim().trim_start_matches(['-', ':', ' ']).trim();
+            let rest = l[prefix.len()..]
+                .trim()
+                .trim_start_matches(['-', ':', ' '])
+                .trim();
             if rest.len() >= 3 {
                 return Some(rest.chars().take(120).collect());
             }
@@ -89,7 +106,11 @@ fn digest(raw: &str) -> Digest {
                 continue;
             }
             if ty == "frame" || ty == "magicframe" {
-                if let Some(n) = el.get("name").and_then(|t| t.as_str()).filter(|n| !n.trim().is_empty()) {
+                if let Some(n) = el
+                    .get("name")
+                    .and_then(|t| t.as_str())
+                    .filter(|n| !n.trim().is_empty())
+                {
                     frames.push(n.trim().to_string());
                 }
             }
@@ -124,7 +145,10 @@ fn digest(raw: &str) -> Digest {
     d.headings.extend(sized.into_iter().take(5).map(|(_, t)| t));
     let mut text = parts.join(" · ");
     if text.len() > 4000 {
-        let cut = (0..=4000).rev().find(|i| text.is_char_boundary(*i)).unwrap_or(0);
+        let cut = (0..=4000)
+            .rev()
+            .find(|i| text.is_char_boundary(*i))
+            .unwrap_or(0);
         text.truncate(cut);
     }
     d.text = text;
@@ -139,7 +163,9 @@ fn cached_digest(cache: &mut HashMap<String, (u64, Digest)>, path: &Path) -> Opt
             return Some(d.clone());
         }
     }
-    let mut d = fs::read_to_string(path).map(|raw| digest(&raw)).unwrap_or_default();
+    let mut d = fs::read_to_string(path)
+        .map(|raw| digest(&raw))
+        .unwrap_or_default();
     d.path = key.clone();
     d.mtime = m;
     cache.insert(key, (m, d.clone()));
@@ -152,7 +178,10 @@ pub fn board_digests(index: tauri::State<'_, SearchIndex>, root: String) -> Vec<
     let mut boards = Vec::new();
     collect_boards(Path::new(&root), &mut boards, 0);
     let mut cache = index.0.lock().unwrap();
-    boards.iter().filter_map(|b| cached_digest(&mut cache, b)).collect()
+    boards
+        .iter()
+        .filter_map(|b| cached_digest(&mut cache, b))
+        .collect()
 }
 
 fn snippet(text: &str, lower: &str, q: &str) -> String {
@@ -193,7 +222,9 @@ pub fn search_text(
     let mut cache = index.0.lock().unwrap();
     let mut hits = Vec::new();
     for b in boards {
-        let Some(d) = cached_digest(&mut cache, &b) else { continue };
+        let Some(d) = cached_digest(&mut cache, &b) else {
+            continue;
+        };
         let key = d.path.clone();
         let text = d.text;
         let lower = text.to_lowercase();

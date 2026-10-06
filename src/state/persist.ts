@@ -4,13 +4,7 @@
  * (`state.json.bak`) is refreshed once per launch from the last good file.
  */
 import { ipc } from "../platform/ipc";
-import {
-  DEFAULT_PREFS,
-  DEFAULT_SIDEBAR_WIDTH,
-  getApp,
-  type PersistedState,
-  type Viewport,
-} from "./store";
+import { DEFAULT_PREFS, DEFAULT_SIDEBAR_WIDTH, getApp, type PersistedState, type Viewport } from "./store";
 
 /** Viewports change constantly while panning, so they live outside zustand. */
 export const viewports: Record<string, Viewport> = {};
@@ -75,9 +69,11 @@ export async function persistNow() {
   if (!paths || !getApp().ready) return;
   window.clearTimeout(timer);
   const json = JSON.stringify(snapshotState(), null, 1);
-  writing = writing.then(() => ipc.writeText(paths.stateFile, json)).catch((e) => {
-    console.error("Failed to persist state", e);
-  });
+  writing = writing
+    .then(() => ipc.writeText(paths.stateFile, json))
+    .catch((e) => {
+      console.error("Failed to persist state", e);
+    });
   await writing;
 }
 

@@ -19,7 +19,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode; label: strin
         <div>
           <strong>Something went wrong in {this.props.label}.</strong>
           <p>Your boards and data are safe on disk.</p>
-          <button className="btn" onClick={() => this.setState({ error: null })}>Try Again</button>
+          <button className="btn" onClick={() => this.setState({ error: null })}>
+            Try Again
+          </button>
         </div>
       </div>
     );

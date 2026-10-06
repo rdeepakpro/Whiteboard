@@ -52,7 +52,17 @@ function close() {
   if (tab) window.setTimeout(() => focusEditor(tab.id), 0);
 }
 
-function Modal({ title, children, wide, onClose = close }: { title: string; children: ReactNode; wide?: boolean; onClose?: () => void }) {
+function Modal({
+  title,
+  children,
+  wide,
+  onClose = close,
+}: {
+  title: string;
+  children: ReactNode;
+  wide?: boolean;
+  onClose?: () => void;
+}) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -65,7 +75,12 @@ function Modal({ title, children, wide, onClose = close }: { title: string; chil
   }, [onClose]);
   return (
     <div className="overlay" onMouseDown={onClose}>
-      <div className={`modal${wide ? " wide" : ""}`} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-label={title}>
+      <div
+        className={`modal${wide ? " wide" : ""}`}
+        onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={title}
+      >
         <div className="modal__head">
           <span>{title}</span>
           <button className="icon-btn small" onClick={onClose} title="Close">
@@ -99,7 +114,12 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <button className={`toggle${checked ? " on" : ""}`} role="switch" aria-checked={checked} onClick={() => onChange(!checked)}>
+    <button
+      className={`toggle${checked ? " on" : ""}`}
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+    >
       <span />
     </button>
   );
@@ -148,10 +168,15 @@ function SettingsDialog({ section }: { section?: string }) {
               <Field label="Reopen previous session" hint="Restore open tabs when Whiteboard starts.">
                 <Toggle checked={prefs.reopenSession} onChange={(v) => setPref("reopenSession", v)} />
               </Field>
-              <Field label="Boards folder" hint="A normal Finder folder. Each workspace is a subfolder; each board is a .excalidraw file.">
+              <Field
+                label="Boards folder"
+                hint="A normal Finder folder. Each workspace is a subfolder; each board is a .excalidraw file."
+              >
                 <div className="path-pick">
                   <code title={prefs.libraryRoot}>{prefs.libraryRoot.replace(/^\/Users\/[^/]+/, "~")}</code>
-                  <button className="btn small" onClick={chooseRoot}>Change…</button>
+                  <button className="btn small" onClick={chooseRoot}>
+                    Change…
+                  </button>
                 </div>
               </Field>
               <Field label="New boards go to" hint="Used when no folder is selected in the sidebar.">
@@ -178,8 +203,8 @@ function SettingsDialog({ section }: { section?: string }) {
                 </select>
               </Field>
               <p className="settings__note">
-                Grid, snapping, stroke and fill defaults, and other drawing preferences live in Excalidraw itself (main menu
-                and the properties panel) and work exactly as in Excalidraw.
+                Grid, snapping, stroke and fill defaults, and other drawing preferences live in Excalidraw itself (main
+                menu and the properties panel) and work exactly as in Excalidraw.
               </p>
             </>
           )}
@@ -189,7 +214,10 @@ function SettingsDialog({ section }: { section?: string }) {
                 <Toggle checked={prefs.autosave} onChange={(v) => setPref("autosave", v)} />
               </Field>
               <Field label="Save after a pause of">
-                <select value={prefs.autosaveDelayMs} onChange={(e) => setPref("autosaveDelayMs", Number(e.target.value))}>
+                <select
+                  value={prefs.autosaveDelayMs}
+                  onChange={(e) => setPref("autosaveDelayMs", Number(e.target.value))}
+                >
                   <option value={500}>0.5 seconds</option>
                   <option value={800}>0.8 seconds</option>
                   <option value={1500}>1.5 seconds</option>
@@ -197,14 +225,20 @@ function SettingsDialog({ section }: { section?: string }) {
                 </select>
               </Field>
               <Field label="History snapshot every" hint="Plus a snapshot whenever you press ⌘S.">
-                <select value={prefs.historyIntervalMin} onChange={(e) => setPref("historyIntervalMin", Number(e.target.value))}>
+                <select
+                  value={prefs.historyIntervalMin}
+                  onChange={(e) => setPref("historyIntervalMin", Number(e.target.value))}
+                >
                   <option value={5}>5 minutes</option>
                   <option value={10}>10 minutes</option>
                   <option value={20}>20 minutes</option>
                   <option value={30}>30 minutes</option>
                 </select>
               </Field>
-              <Field label="Keep at most" hint="Older snapshots are thinned out to one per hour, then one per day (60 days).">
+              <Field
+                label="Keep at most"
+                hint="Older snapshots are thinned out to one per hour, then one per day (60 days)."
+              >
                 <select value={prefs.historyMax} onChange={(e) => setPref("historyMax", Number(e.target.value))}>
                   <option value={40}>40 versions per board</option>
                   <option value={80}>80 versions per board</option>
@@ -215,16 +249,19 @@ function SettingsDialog({ section }: { section?: string }) {
           )}
           {tab === "Capture" && (
             <>
-              <Field label="⌘⇧2 works everywhere" hint="Capture a screenshot onto your board even while another app is in front.">
+              <Field
+                label="⌘⇧2 works everywhere"
+                hint="Capture a screenshot onto your board even while another app is in front."
+              >
                 <Toggle checked={prefs.globalCaptureShortcut} onChange={(v) => setPref("globalCaptureShortcut", v)} />
               </Field>
               <Field label="Hide Whiteboard while capturing" hint="So you can select whatever is behind it.">
                 <Toggle checked={prefs.hideWhileCapturing} onChange={(v) => setPref("hideWhileCapturing", v)} />
               </Field>
               <p className="settings__note">
-                Screenshots use macOS's own selection tool (press Space to switch to window mode, Esc to cancel). They're
-                stored inside the board file, so nothing is saved to your Desktop. macOS asks for Screen Recording
-                permission the first time.
+                Screenshots use macOS's own selection tool (press Space to switch to window mode, Esc to cancel).
+                They're stored inside the board file, so nothing is saved to your Desktop. macOS asks for Screen
+                Recording permission the first time.
               </p>
               <p className="settings__note">
                 Link previews: when you insert a link, Whiteboard fetches that page (or YouTube's public oEmbed info)
@@ -242,7 +279,15 @@ function SettingsDialog({ section }: { section?: string }) {
                 <Toggle checked={prefs.showRecentsInSidebar} onChange={(v) => setPref("showRecentsInSidebar", v)} />
               </Field>
               <Field label="Sidebar width">
-                <button className="btn small" onClick={() => { setApp({ sidebarWidth: 248 }); schedulePersist(); }}>Reset</button>
+                <button
+                  className="btn small"
+                  onClick={() => {
+                    setApp({ sidebarWidth: 248 });
+                    schedulePersist();
+                  }}
+                >
+                  Reset
+                </button>
               </Field>
             </>
           )}
@@ -252,11 +297,13 @@ function SettingsDialog({ section }: { section?: string }) {
               <div className="about__name">Whiteboard</div>
               <div className="muted">Version {version}</div>
               <p>
-                A personal desktop home for your boards. The drawing editor is{" "}
-                <strong>Excalidraw</strong> {EXCALIDRAW_VERSION} (MIT License, © Excalidraw), used unmodified.
+                A personal desktop home for your boards. The drawing editor is <strong>Excalidraw</strong>{" "}
+                {EXCALIDRAW_VERSION} (MIT License, © Excalidraw), used unmodified.
               </p>
               <p className="muted small">Data folder: {getApp().paths?.dataDir.replace(/^\/Users\/[^/]+/, "~")}</p>
-              <button className="btn" onClick={() => setApp({ dialog: { kind: "licenses" } })}>Licenses & Acknowledgements</button>
+              <button className="btn" onClick={() => setApp({ dialog: { kind: "licenses" } })}>
+                Licenses & Acknowledgements
+              </button>
             </div>
           )}
         </div>
@@ -281,18 +328,26 @@ function TemplatePreview({ id, build }: { id: string; build: () => Promise<strin
           const scene = parseScene(content);
           const elements = getNonDeletedElements(scene.elements);
           if (!elements.length) return null;
-          return exportToSvg({ elements, appState: { ...scene.appState, exportBackground: false }, files: scene.files, exportPadding: 8 });
+          return exportToSvg({
+            elements,
+            appState: { ...scene.appState, exportBackground: false },
+            files: scene.files,
+            exportPadding: 8,
+          });
         }),
       );
     }
-    templatePreviews.get(id)!.then((svg) => {
-      if (cancelled || !ref.current) return;
-      if (!svg) return ref.current.replaceChildren();
-      const copy = svg.cloneNode(true) as SVGSVGElement;
-      copy.removeAttribute("width");
-      copy.removeAttribute("height");
-      ref.current.replaceChildren(copy);
-    }, () => {});
+    templatePreviews.get(id)!.then(
+      (svg) => {
+        if (cancelled || !ref.current) return;
+        if (!svg) return ref.current.replaceChildren();
+        const copy = svg.cloneNode(true) as SVGSVGElement;
+        copy.removeAttribute("width");
+        copy.removeAttribute("height");
+        ref.current.replaceChildren(copy);
+      },
+      () => {},
+    );
     return () => {
       cancelled = true;
     };
@@ -329,8 +384,12 @@ function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "
     <Modal title="New Board" wide>
       <div className="templates__tabs">
         <div className="seg">
-          <button className={tab === "brainstorm" ? "active" : ""} onClick={() => setTab("brainstorm")}>Brainstorm</button>
-          <button className={tab === "design" ? "active" : ""} onClick={() => setTab("design")}>Design</button>
+          <button className={tab === "brainstorm" ? "active" : ""} onClick={() => setTab("brainstorm")}>
+            Brainstorm
+          </button>
+          <button className={tab === "design" ? "active" : ""} onClick={() => setTab("design")}>
+            Design
+          </button>
         </div>
         {tab === "design" && (
           <div className="seg small">
@@ -346,7 +405,11 @@ function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "
         <>
           <div className="templates">
             {builtins.map((t) => (
-              <button key={t.id} className="template" onClick={() => create(t.id === "blank" ? undefined : t.name, t.build)}>
+              <button
+                key={t.id}
+                className="template"
+                onClick={() => create(t.id === "blank" ? undefined : t.name, t.build)}
+              >
                 <TemplatePreview id={t.id} build={t.build} />
                 <span className="template__name">{t.name}</span>
                 <span className="template__desc">{t.description}</span>
@@ -362,7 +425,14 @@ function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "
           ) : (
             <div className="templates">
               {mine.map((t) => (
-                <div key={t.id} className="template" role="button" tabIndex={0} onClick={() => create(t.name, t.build)} onKeyDown={(e) => e.key === "Enter" && create(t.name, t.build)}>
+                <div
+                  key={t.id}
+                  className="template"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => create(t.name, t.build)}
+                  onKeyDown={(e) => e.key === "Enter" && create(t.name, t.build)}
+                >
                   <TemplatePreview id={t.id} build={t.build} />
                   <span className="template__name">{t.name}</span>
                   <span className="template__desc">{t.description}</span>
@@ -397,8 +467,8 @@ function TemplatesDialog({ folder, tab: initialTab }: { folder?: string; tab?: "
             })}
           </div>
           <p className="settings__note">
-            Design boards add a <strong>Design</strong> panel (top right) with screens, buttons, inputs, cards and more —
-            click a piece to add it, or drag it in. Everything stays normal Excalidraw shapes.
+            Design boards add a <strong>Design</strong> panel (top right) with screens, buttons, inputs, cards and more
+            — click a piece to add it, or drag it in. Everything stays normal Excalidraw shapes.
           </p>
         </>
       )}
@@ -478,7 +548,9 @@ function ShortcutsDialog() {
         {activeTab() && (
           <>
             {" "}
-            <button className="linkish" onClick={openExcalidrawHelp}>Show Excalidraw's shortcut list</button>
+            <button className="linkish" onClick={openExcalidrawHelp}>
+              Show Excalidraw's shortcut list
+            </button>
           </>
         )}
       </p>
@@ -498,9 +570,15 @@ function ActionSettings() {
         <Toggle checked={prefs.checkInReminder} onChange={(v) => setPref("checkInReminder", v)} />
       </Field>
       <Field label="Nudge after">
-        <select value={prefs.checkInHour} onChange={(e) => setPref("checkInHour", Number(e.target.value))} disabled={!prefs.checkInReminder}>
+        <select
+          value={prefs.checkInHour}
+          onChange={(e) => setPref("checkInHour", Number(e.target.value))}
+          disabled={!prefs.checkInReminder}
+        >
           {[16, 17, 18, 19, 20, 21, 22].map((h) => (
-            <option key={h} value={h}>{new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: "numeric" })}</option>
+            <option key={h} value={h}>
+              {new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: "numeric" })}
+            </option>
           ))}
         </select>
       </Field>
@@ -518,7 +596,9 @@ function ActionSettings() {
             <select value={prefs.localAiModel} onChange={(e) => setPref("localAiModel", e.target.value)}>
               <option value="">Choose…</option>
               {models.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
           ) : (
@@ -583,7 +663,9 @@ function InsertLinkDialog({ variant }: { variant: keyof typeof LINK_HINTS }) {
           }}
           onKeyDown={(e) => e.key === "Enter" && submit()}
         />
-        <button className="btn primary small" onClick={submit}>Insert</button>
+        <button className="btn primary small" onClick={submit}>
+          Insert
+        </button>
       </div>
       <div className={`link-input__hint${error ? " error" : ""}`}>
         {error ? "That doesn't look like a link." : "Tip: you can also paste a link straight onto the canvas."}
@@ -609,7 +691,9 @@ function SendToActionDialog(props: {
 }) {
   const [kind, setKind] = useState<(typeof SEND_KINDS)[number]["kind"]>(props.itemKind ?? "move");
   const [title, setTitle] = useState(props.title);
-  const [goal, setGoal] = useState(props.boardPath && !isMessyName(boardName(props.boardPath)) ? boardName(props.boardPath) : "");
+  const [goal, setGoal] = useState(
+    props.boardPath && !isMessyName(boardName(props.boardPath)) ? boardName(props.boardPath) : "",
+  );
   const [date, setDate] = useState(() => addDays(dayKey(), 14));
   const [linked, setLinked] = useState(props.boardPath);
   const blocked = limitReason(kind);
@@ -626,7 +710,10 @@ function SendToActionDialog(props: {
     close();
     if (item) {
       const where = { priority: "Today", move: "Next Moves", milestone: "Milestones", blocker: "Blockers" }[kind];
-      toast(`Added to ${where}`, "info", { label: "Open Action", run: () => setApp({ mode: "action", actionTab: "plan" }) });
+      toast(`Added to ${where}`, "info", {
+        label: "Open Action",
+        run: () => setApp({ mode: "action", actionTab: "plan" }),
+      });
     }
   };
   return (
@@ -646,8 +733,19 @@ function SendToActionDialog(props: {
           </label>
         )}
         <label className="send__field">
-          {kind === "move" ? "Next move" : kind === "milestone" ? "Milestone" : kind === "blocker" ? "Blocker" : "Priority"}
-          <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} />
+          {kind === "move"
+            ? "Next move"
+            : kind === "milestone"
+              ? "Milestone"
+              : kind === "blocker"
+                ? "Blocker"
+                : "Priority"}
+          <input
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+          />
         </label>
         {kind === "milestone" && (
           <label className="send__field">
@@ -660,7 +758,9 @@ function SendToActionDialog(props: {
             <>
               Linked to <strong>{boardName(linked)}</strong>
               {props.elementIds?.length && linked === props.boardPath ? " (the selected shapes)" : ""}
-              <button className="linkish small" onClick={() => setLinked(null)}>Remove link</button>
+              <button className="linkish small" onClick={() => setLinked(null)}>
+                Remove link
+              </button>
             </>
           ) : (
             <span className="muted">Not linked to a board</span>
@@ -668,7 +768,9 @@ function SendToActionDialog(props: {
         </div>
         {blocked && <div className="send__warn">{blocked} Pick another type, or finish one first.</div>}
         <div className="send__actions">
-          <button className="btn" onClick={close}>Cancel</button>
+          <button className="btn" onClick={close}>
+            Cancel
+          </button>
           <button className="btn primary" disabled={!title.trim() || !!blocked} onClick={submit}>
             Send to Action
           </button>

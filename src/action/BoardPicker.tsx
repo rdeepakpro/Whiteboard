@@ -44,7 +44,13 @@ export function BoardPicker({
 
   return (
     <div className="picker" ref={ref}>
-      <input autoFocus placeholder="Link a board…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && results[0] && onPick(results[0])} />
+      <input
+        autoFocus
+        placeholder="Link a board…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && results[0] && onPick(results[0])}
+      />
       <div className="picker__list">
         {results.map((p) => (
           <button key={p} className={`picker__item${p === current ? " current" : ""}`} onClick={() => onPick(p)}>
