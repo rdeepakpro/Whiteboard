@@ -445,7 +445,7 @@ fn fetch_page(agent: &ureq::Agent, url: &str, kind: &str) -> Preview {
     p.description = m.description;
     p.site_name = m.site_name;
     p.author = m.author;
-    if let Some(img) = m.image.as_deref().and_then(&resolve) {
+    if let Some(img) = m.image.as_deref().and_then(resolve) {
         p.image = image_from(agent, &img, MAX_IMAGE);
     }
     // Favicon: prefer PNG/apple-touch icons, fall back to /favicon.ico.
