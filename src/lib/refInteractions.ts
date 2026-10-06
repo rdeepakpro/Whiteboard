@@ -12,6 +12,8 @@
  *  - right-click a card           → short card menu
  *  - "/" on the canvas            → command palette with slash commands
  */
+import { getCommonBounds } from "@excalidraw/excalidraw";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { activeTab, getApp, setApp } from "../state/store";
 import { activeSession, editorContainer } from "../editor/registry";
 import { clientToScene } from "./canvasInsert";
@@ -49,8 +51,9 @@ function activeCanvasContext() {
   const container = tab && editorContainer(tab.id);
   if (!session?.api || !container) return null;
   const a = document.activeElement;
+  // Any focus in the Brainstorm shell counts (canvas, sidebar, tabs) —
+  // only text fields keep their normal paste.
   if (isWritable(a)) return null;
-  if (a && a !== document.body && !container.contains(a)) return null;
   return { session, api: session.api, container };
 }
 
@@ -183,6 +186,26 @@ function onKeyDown(e: KeyboardEvent) {
   setApp({ dialog: { kind: "palette", query: "/" } });
 }
 
+/** ⌘-click on any shape or text that has a link opens it right away. */
+function onCmdClick(e: PointerEvent) {
+  if (!e.metaKey || e.button !== 0 || !eventOnVisibleCanvas(e)) return;
+  const api = activeSession()?.api;
+  if (!api) return;
+  const p = clientToScene(api, e.clientX, e.clientY);
+  const els = api.getSceneElements();
+  for (let i = els.length - 1; i >= 0; i--) {
+    const el = els[i];
+    if (!el.link || !/^https?:|^mailto:/i.test(el.link)) continue;
+    const [x1, y1, x2, y2] = getCommonBounds([el]);
+    if (p.x >= x1 && p.x <= x2 && p.y >= y1 && p.y <= y2) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openUrl(el.link).catch(() => {});
+      return;
+    }
+  }
+}
+
 export function installRefInteractions() {
   window.addEventListener(
     "pointermove",
@@ -196,6 +219,7 @@ export function installRefInteractions() {
   window.addEventListener("dragover", onDragOver, true);
   window.addEventListener("drop", onDrop, true);
   window.addEventListener("dblclick", onDoubleClick, true);
+  window.addEventListener("pointerdown", onCmdClick, true);
   window.addEventListener("contextmenu", onContextMenu, true);
   window.addEventListener("keydown", onKeyDown, true);
 }

@@ -102,6 +102,9 @@ is never written into `.excalidraw` files.
   `customData.wbRef = { cardId, url, kind, role }` (Excalidraw's official
   metadata field), and the card's rectangle has a standard Excalidraw `link`,
   so the link still works in plain Excalidraw.
+- **Links in your own text are clickable.** Any text or shape label that
+  contains a URL (`https://…` or `www.…`) gets a standard Excalidraw link
+  automatically. ⌘-click any linked shape or text to open it.
 - **Open a card** by double-clicking it or clicking Excalidraw's link icon.
   Clicking or dragging never opens it. Right-click a card for Open Link, Copy
   URL, Refresh Preview, Duplicate, Remove Preview, Convert to Plain Link and
@@ -123,11 +126,11 @@ is never written into `.excalidraw` files.
 
 Whiteboard makes network requests **only when you insert or refresh a link**:
 
-| Link           | Requests                                                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| YouTube        | `youtube.com/oembed` (YouTube's documented public endpoint: title and channel) and the video thumbnail from `i.ytimg.com`                                                                              |
-| Instagram      | one GET of the post page to read Open Graph tags. Instagram usually returns none without a login, so you get a clean fallback card. Whiteboard doesn't log in, use tokens, or pretend to be a crawler. |
-| Any other site | one GET of the page (title / Open Graph tags), its preview image, and its favicon                                                                                                                      |
+| Link           | Requests                                                                                                                                                                                                                                        |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| YouTube        | `youtube.com/oembed` (YouTube's documented public endpoint: title and channel) and the video thumbnail from `i.ytimg.com`                                                                                                                       |
+| Instagram      | one GET of the post page. Instagram serves no preview tags to plain requests, so the page is then loaded once in a hidden, invisible web view to read its image and caption (no login, no tokens). If that fails you get a clean fallback card. |
+| Any other site | one GET of the page (title / Open Graph tags), its preview image, and its favicon                                                                                                                                                               |
 
 If a site can't be resolved, a DNS lookup of `apple.com` (no HTTP request)
 distinguishes "offline" from "site unreachable". Board contents are never

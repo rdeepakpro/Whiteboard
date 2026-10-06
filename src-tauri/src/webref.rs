@@ -536,6 +536,15 @@ pub async fn link_preview(app: AppHandle, url: String, refresh: bool) -> Preview
         status: "unavailable".into(),
         ..Default::default()
     });
+    // Pages that only render with JavaScript (Instagram, many modern sites)
+    // expose nothing to a plain fetch. Render them in a hidden web view, the
+    // way a browser would, and read the preview from the rendered page.
+    let js_only = p.status == "unavailable" || (p.kind == "instagram" && p.image.is_none());
+    if js_only && p.status != "offline" {
+        if let Some(r) = render_meta(&app, &url).await {
+            apply_rendered(&mut p, r).await;
+        }
+    }
     p.fetched_at = now_ms();
     // Cache successes only, so offline/unavailable links are retried later.
     if p.status == "ok" || p.status == "partial" {
@@ -696,4 +705,113 @@ pub async fn local_ai_models() -> Option<Vec<String>> {
     .await
     .ok()
     .flatten()
+}
+
+// ------------------------------------------- rendering JS-only pages
+
+#[derive(Deserialize, Default)]
+struct Rendered {
+    image: Option<String>,
+    title: Option<String>,
+    desc: Option<String>,
+}
+
+/// Runs in the hidden page: waits until an Open Graph image or a large image
+/// is present (or ~9s pass), then reports back by navigating to a private
+/// scheme, which Rust intercepts. The page gets no access to the app.
+const RENDER_SCRIPT: &str = r#"
+(function () {
+  if (window.__wbmeta || location.protocol === "wbmeta:") return;
+  window.__wbmeta = 1;
+  var start = Date.now();
+  function meta(p) {
+    var el = document.querySelector('meta[property="' + p + '"],meta[name="' + p + '"]');
+    return el && el.content ? el.content : null;
+  }
+  function pick() {
+    var image = meta("og:image") || meta("twitter:image");
+    if (!image) {
+      var best = null, area = 0;
+      for (var i = 0; i < document.images.length; i++) {
+        var img = document.images[i], w = img.naturalWidth, h = img.naturalHeight, src = img.currentSrc || img.src;
+        if (w >= 240 && h >= 240 && w * h > area && /^https?:/.test(src)) { area = w * h; best = src; }
+      }
+      image = best;
+    }
+    return { image: image, title: meta("og:title") || document.title || null, desc: meta("og:description") || meta("description") };
+  }
+  function tick() {
+    var r = pick();
+    if (r.image || Date.now() - start > 9000) {
+      location.href = "wbmeta://done?d=" + encodeURIComponent(JSON.stringify(r));
+    } else {
+      setTimeout(tick, 400);
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(tick, 600); });
+  else setTimeout(tick, 600);
+})();
+"#;
+
+async fn render_meta(app: &AppHandle, url: &str) -> Option<Rendered> {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::mpsc;
+    static N: AtomicU64 = AtomicU64::new(0);
+    let parsed: url::Url = url.parse().ok()?;
+    let label = format!("wbmeta-{}", N.fetch_add(1, Ordering::Relaxed));
+    let (tx, rx) = mpsc::channel::<Rendered>();
+    let window = tauri::WebviewWindowBuilder::new(app, &label, tauri::WebviewUrl::External(parsed))
+        .visible(false)
+        .focused(false)
+        .skip_taskbar(true)
+        .inner_size(1100.0, 900.0)
+        .initialization_script(RENDER_SCRIPT)
+        .on_navigation(move |nav| {
+            if nav.scheme() != "wbmeta" {
+                return true;
+            }
+            let data = nav
+                .query_pairs()
+                .find(|(k, _)| k == "d")
+                .map(|(_, v)| v.to_string())
+                .unwrap_or_default();
+            let _ = tx.send(serde_json::from_str(&data).unwrap_or_default());
+            false
+        })
+        .build()
+        .ok()?;
+    let result =
+        tauri::async_runtime::spawn_blocking(move || rx.recv_timeout(Duration::from_secs(14)).ok())
+            .await
+            .ok()
+            .flatten();
+    let _ = window.destroy();
+    result
+}
+
+async fn apply_rendered(p: &mut Preview, r: Rendered) {
+    let generic = |t: &str| t.trim().is_empty() || t.trim() == "Instagram" || t.contains("Login");
+    if let Some(t) = r.title.as_deref().filter(|t| !generic(t)) {
+        // Instagram titles look like: `Name on Instagram: "caption…"`.
+        if let Some((who, rest)) = t.split_once(" on Instagram") {
+            p.author = clean(who);
+            let caption = rest.trim_start_matches(':').trim().trim_matches('"');
+            p.description = clean(caption).or(p.description.take());
+        } else {
+            p.title = clean(t);
+        }
+    }
+    if p.description.is_none() {
+        p.description = r.desc.as_deref().and_then(clean);
+    }
+    if let Some(img) = r.image {
+        p.image =
+            tauri::async_runtime::spawn_blocking(move || image_from(&agent(), &img, MAX_IMAGE))
+                .await
+                .ok()
+                .flatten();
+    }
+    if p.image.is_some() || p.title.is_some() || p.author.is_some() {
+        p.status = if p.image.is_some() { "ok" } else { "partial" }.into();
+    }
 }

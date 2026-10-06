@@ -394,7 +394,7 @@ async function toImage(img: LinkPreview["image"], opts: { maxSide: number; jpeg?
       preferJpeg: opts.jpeg,
       maxBytes: 400_000,
     });
-  } catch {
+  } catch (e) {
     return null; // undecodable image: just skip it
   }
 }

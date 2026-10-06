@@ -9,6 +9,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Excalidraw, MainMenu, WelcomeScreen, getCommonBounds } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI, ExcalidrawInitialDataState, UIOptions } from "@excalidraw/excalidraw/types";
 import { BoardSession } from "./BoardSession";
+import { scheduleAutoLink } from "../lib/autolink";
 import { sessions, focusEditor } from "./registry";
 export { focusEditor };
 import { getApp, setApp, setTabStatus } from "../state/store";
@@ -127,6 +128,7 @@ export const BoardEditor = memo(function BoardEditor({ tabId, path, active, them
       },
       onChange: (elements: any, appState: any, files: any) => {
         session.onChange(elements, appState, files);
+        if (session.api) scheduleAutoLink(session.api);
         if (!activeRef.current) return;
         // Excalidraw's own theme toggle (main menu / Alt+Shift+D) updates
         // prefs. Only react to a change Excalidraw made itself, not to the
