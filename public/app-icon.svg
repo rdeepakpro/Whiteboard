@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F1F3F7"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5B8DEF"/>
+      <stop offset="1" stop-color="#3D6FE0"/>
+    </linearGradient>
+    <linearGradient id="tileBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A9C8FF"/>
+      <stop offset="1" stop-color="#83AEF8"/>
+    </linearGradient>
+    <linearGradient id="tileGrey" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8EAEE"/>
+      <stop offset="1" stop-color="#D3D6DC"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#1B2440" flood-opacity="0.16"/>
+    </filter>
+    <filter id="tileShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1B2440" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)" filter="url(#shadow)"/>
+  <rect x="100.5" y="100.5" width="823" height="823" rx="185" fill="none" stroke="#000" stroke-opacity="0.05"/>
+  <g filter="url(#tileShadow)">
+    <rect x="620" y="245" width="178" height="150" rx="34" fill="url(#tileGrey)" transform="rotate(8 709 320)"/>
+    <rect x="610" y="610" width="180" height="150" rx="34" fill="url(#tileBlue)" transform="rotate(-6 700 685)"/>
+  </g>
+  <path d="M215 680 C 250 590, 300 455, 368 450 C 440 445, 420 640, 482 636 C 540 632, 552 520, 606 512 C 640 508, 646 548, 618 556"
+        fill="none" stroke="url(#stroke)" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

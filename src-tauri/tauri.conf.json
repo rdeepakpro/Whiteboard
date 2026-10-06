@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Whiteboard",
+  "version": "1.0.0",
+  "identifier": "com.local.whiteboard",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Whiteboard",
+        "width": 1360,
+        "height": 860,
+        "minWidth": 720,
+        "minHeight": 480,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": { "x": 16, "y": 19 },
+        "dragDropEnabled": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$APPDATA/**"]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "category": "Productivity",
+    "shortDescription": "Whiteboard",
+    "longDescription": "A personal desktop home for Excalidraw boards.",
+    "copyright": "Whiteboard. Editor: Excalidraw (MIT).",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "../LICENSES/": "LICENSES/"
+    },
+    "fileAssociations": [
+      {
+        "ext": ["excalidraw"],
+        "name": "Excalidraw Drawing",
+        "description": "Excalidraw drawing",
+        "role": "Editor",
+        "mimeType": "application/vnd.excalidraw+json",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["excalidrawlib"],
+        "name": "Excalidraw Library",
+        "description": "Excalidraw library",
+        "role": "Viewer",
+        "mimeType": "application/vnd.excalidrawlib+json",
+        "rank": "Alternate"
+      }
+    ],
+    "macOS": {
+      "minimumSystemVersion": "12.0"
+    }
+  }
+}
